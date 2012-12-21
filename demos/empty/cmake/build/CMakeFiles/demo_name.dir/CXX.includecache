@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../../../../jadi/include/jadi/Jadi.h
+stdio.h
+-
+iostream
+-
+
+/Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.cpp
+Demo.h
+/Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.h
+
+/Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.h
+jadi/Jadi.h
+-
+
+/Users/diederickhuijbers/c++/jadi/demos/empty/src/main.cpp
+jadi/Jadi.h
+-
+
+/Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.cpp
+
+/Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.cpp
+
+/Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.cpp
+
+/Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.cpp
+
