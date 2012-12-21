@@ -28,6 +28,11 @@ if(APPLE)
   set(CMAKE_EXE_LINKER_FLAGS " -framework CoreFoundation -framework OpenGL -framework Cocoa -framework IOKit ")
 endif(APPLE)
 
+if(UNIX AND NOT APPLE)
+  set(jadi_defines "-DJADI_PLATFORM=JADI_LINUX")
+  #set(CMAKE_EXE_LINKER_FLAGS 
+endif(UNIX AND NOT APPLE)
+
 include_directories(
   ${jadi_include_dirs}
 )
