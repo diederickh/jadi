@@ -13,5 +13,5 @@
 #include <stdio.h>
 #include <iostream>
 #include <opengl/glfw3.h>
-
+#include <stdlib.h>
 #endif

@@ -50,7 +50,12 @@ if(JADI_PLATFORM_LINUX)
   set(jadi_libs 
     ${jadi_lib_dir}linux/libGLEW.a
     ${jadi_lib_dir}linux/libglfw3.a
-    )
+    GL
+    X11
+    Xxf86vm
+    rt
+    pthread
+)
 endif(JADI_PLATFORM_LINUX)
 
 

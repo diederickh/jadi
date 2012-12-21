@@ -1,4 +1,4 @@
-# Install script for directory: /Users/diederickhuijbers/c++/jadi/demos/empty/cmake
+# Install script for directory: /home/james/Development/projects/jadi/jadi/demos/empty/cmake
 
 # Set the install prefix
 IF(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -27,14 +27,31 @@ IF(NOT CMAKE_INSTALL_COMPONENT)
   ENDIF(COMPONENT)
 ENDIF(NOT CMAKE_INSTALL_COMPONENT)
 
+# Install shared libraries without execute permission?
+IF(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
+  SET(CMAKE_INSTALL_SO_NO_EXE "0")
+ENDIF(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
+
 IF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  list(APPEND CPACK_ABSOLUTE_DESTINATION_FILES
-   "/Users/diederickhuijbers/c++/jadi/demos/empty/cmake/../bin/demo")
-FILE(INSTALL DESTINATION "/Users/diederickhuijbers/c++/jadi/demos/empty/cmake/../bin" TYPE EXECUTABLE FILES "/Users/diederickhuijbers/c++/jadi/demos/empty/cmake/build/demo")
-  IF(EXISTS "$ENV{DESTDIR}/Users/diederickhuijbers/c++/jadi/demos/empty/cmake/../bin/demo" AND
-     NOT IS_SYMLINK "$ENV{DESTDIR}/Users/diederickhuijbers/c++/jadi/demos/empty/cmake/../bin/demo")
+  IF(EXISTS "$ENV{DESTDIR}/home/james/Development/projects/jadi/jadi/demos/empty/cmake/../bin/demo" AND
+     NOT IS_SYMLINK "$ENV{DESTDIR}/home/james/Development/projects/jadi/jadi/demos/empty/cmake/../bin/demo")
+    FILE(RPATH_CHECK
+         FILE "$ENV{DESTDIR}/home/james/Development/projects/jadi/jadi/demos/empty/cmake/../bin/demo"
+         RPATH "")
+  ENDIF()
+  list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
+   "/home/james/Development/projects/jadi/jadi/demos/empty/cmake/../bin/demo")
+  IF (CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
+    message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
+  ENDIF (CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
+  IF (CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
+    message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
+  ENDIF (CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
+FILE(INSTALL DESTINATION "/home/james/Development/projects/jadi/jadi/demos/empty/cmake/../bin" TYPE EXECUTABLE FILES "/home/james/Development/projects/jadi/jadi/demos/empty/cmake/build/demo")
+  IF(EXISTS "$ENV{DESTDIR}/home/james/Development/projects/jadi/jadi/demos/empty/cmake/../bin/demo" AND
+     NOT IS_SYMLINK "$ENV{DESTDIR}/home/james/Development/projects/jadi/jadi/demos/empty/cmake/../bin/demo")
     IF(CMAKE_INSTALL_DO_STRIP)
-      EXECUTE_PROCESS(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}/Users/diederickhuijbers/c++/jadi/demos/empty/cmake/../bin/demo")
+      EXECUTE_PROCESS(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}/home/james/Development/projects/jadi/jadi/demos/empty/cmake/../bin/demo")
     ENDIF(CMAKE_INSTALL_DO_STRIP)
   ENDIF()
 ENDIF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
@@ -45,7 +62,7 @@ ELSE(CMAKE_INSTALL_COMPONENT)
   SET(CMAKE_INSTALL_MANIFEST "install_manifest.txt")
 ENDIF(CMAKE_INSTALL_COMPONENT)
 
-FILE(WRITE "/Users/diederickhuijbers/c++/jadi/demos/empty/cmake/build/${CMAKE_INSTALL_MANIFEST}" "")
+FILE(WRITE "/home/james/Development/projects/jadi/jadi/demos/empty/cmake/build/${CMAKE_INSTALL_MANIFEST}" "")
 FOREACH(file ${CMAKE_INSTALL_MANIFEST_FILES})
-  FILE(APPEND "/Users/diederickhuijbers/c++/jadi/demos/empty/cmake/build/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
+  FILE(APPEND "/home/james/Development/projects/jadi/jadi/demos/empty/cmake/build/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
 ENDFOREACH(file)

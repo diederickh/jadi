@@ -8,7 +8,7 @@ default_target: all
 #=============================================================================
 # Special targets provided by cmake.
 
-# Disable implicit rules so canoncical targets will work.
+# Disable implicit rules so canonical targets will work.
 .SUFFIXES:
 
 # Remove some rules from gmake that .SUFFIXES does not remove.
@@ -30,19 +30,22 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = "/Applications/CMake 2.8-3.app/Contents/bin/cmake"
+CMAKE_COMMAND = /usr/bin/cmake
 
 # The command to remove a file.
-RM = "/Applications/CMake 2.8-3.app/Contents/bin/cmake" -E remove -f
+RM = /usr/bin/cmake -E remove -f
+
+# Escaping for special characters.
+EQUALS = =
 
 # The program to use to edit the cache.
-CMAKE_EDIT_COMMAND = "/Applications/CMake 2.8-3.app/Contents/bin/ccmake"
+CMAKE_EDIT_COMMAND = /usr/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/diederickhuijbers/c++/jadi/demos/empty/cmake
+CMAKE_SOURCE_DIR = /home/james/Development/projects/jadi/jadi/demos/empty/cmake
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/diederickhuijbers/c++/jadi/demos/empty/cmake/build
+CMAKE_BINARY_DIR = /home/james/Development/projects/jadi/jadi/demos/empty/cmake/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -50,7 +53,7 @@ CMAKE_BINARY_DIR = /Users/diederickhuijbers/c++/jadi/demos/empty/cmake/build
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	"/Applications/CMake 2.8-3.app/Contents/bin/ccmake" -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -60,19 +63,19 @@ edit_cache/fast: edit_cache
 # Special rule for the target install
 install: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	"/Applications/CMake 2.8-3.app/Contents/bin/cmake" -P cmake_install.cmake
+	/usr/bin/cmake -P cmake_install.cmake
 .PHONY : install
 
 # Special rule for the target install
 install/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	"/Applications/CMake 2.8-3.app/Contents/bin/cmake" -P cmake_install.cmake
+	/usr/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
 
 # Special rule for the target install/local
 install/local: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	"/Applications/CMake 2.8-3.app/Contents/bin/cmake" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local
 
 # Special rule for the target install/local
@@ -82,7 +85,7 @@ install/local/fast: install/local
 # Special rule for the target install/strip
 install/strip: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	"/Applications/CMake 2.8-3.app/Contents/bin/cmake" -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip
 
 # Special rule for the target install/strip
@@ -101,7 +104,7 @@ list_install_components/fast: list_install_components
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	"/Applications/CMake 2.8-3.app/Contents/bin/cmake" -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -110,9 +113,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/diederickhuijbers/c++/jadi/demos/empty/cmake/build/CMakeFiles /Users/diederickhuijbers/c++/jadi/demos/empty/cmake/build/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/james/Development/projects/jadi/jadi/demos/empty/cmake/build/CMakeFiles /home/james/Development/projects/jadi/jadi/demos/empty/cmake/build/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/diederickhuijbers/c++/jadi/demos/empty/cmake/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/james/Development/projects/jadi/jadi/demos/empty/cmake/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -152,149 +155,149 @@ demo/fast:
 	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/build
 .PHONY : demo/fast
 
-Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.o: Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.cpp.o
-.PHONY : Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.o
+home/james/Development/projects/jadi/jadi/demos/empty/src/Demo.o: home/james/Development/projects/jadi/jadi/demos/empty/src/Demo.cpp.o
+.PHONY : home/james/Development/projects/jadi/jadi/demos/empty/src/Demo.o
 
 # target to build an object file
-Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.cpp.o:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.cpp.o
-.PHONY : Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.cpp.o
+home/james/Development/projects/jadi/jadi/demos/empty/src/Demo.cpp.o:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/home/james/Development/projects/jadi/jadi/demos/empty/src/Demo.cpp.o
+.PHONY : home/james/Development/projects/jadi/jadi/demos/empty/src/Demo.cpp.o
 
-Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.i: Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.cpp.i
-.PHONY : Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.i
+home/james/Development/projects/jadi/jadi/demos/empty/src/Demo.i: home/james/Development/projects/jadi/jadi/demos/empty/src/Demo.cpp.i
+.PHONY : home/james/Development/projects/jadi/jadi/demos/empty/src/Demo.i
 
 # target to preprocess a source file
-Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.cpp.i:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.cpp.i
-.PHONY : Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.cpp.i
+home/james/Development/projects/jadi/jadi/demos/empty/src/Demo.cpp.i:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/home/james/Development/projects/jadi/jadi/demos/empty/src/Demo.cpp.i
+.PHONY : home/james/Development/projects/jadi/jadi/demos/empty/src/Demo.cpp.i
 
-Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.s: Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.cpp.s
-.PHONY : Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.s
+home/james/Development/projects/jadi/jadi/demos/empty/src/Demo.s: home/james/Development/projects/jadi/jadi/demos/empty/src/Demo.cpp.s
+.PHONY : home/james/Development/projects/jadi/jadi/demos/empty/src/Demo.s
 
 # target to generate assembly for a file
-Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.cpp.s:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.cpp.s
-.PHONY : Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.cpp.s
+home/james/Development/projects/jadi/jadi/demos/empty/src/Demo.cpp.s:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/home/james/Development/projects/jadi/jadi/demos/empty/src/Demo.cpp.s
+.PHONY : home/james/Development/projects/jadi/jadi/demos/empty/src/Demo.cpp.s
 
-Users/diederickhuijbers/c++/jadi/demos/empty/src/main.o: Users/diederickhuijbers/c++/jadi/demos/empty/src/main.cpp.o
-.PHONY : Users/diederickhuijbers/c++/jadi/demos/empty/src/main.o
+home/james/Development/projects/jadi/jadi/demos/empty/src/main.o: home/james/Development/projects/jadi/jadi/demos/empty/src/main.cpp.o
+.PHONY : home/james/Development/projects/jadi/jadi/demos/empty/src/main.o
 
 # target to build an object file
-Users/diederickhuijbers/c++/jadi/demos/empty/src/main.cpp.o:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/Users/diederickhuijbers/c++/jadi/demos/empty/src/main.cpp.o
-.PHONY : Users/diederickhuijbers/c++/jadi/demos/empty/src/main.cpp.o
+home/james/Development/projects/jadi/jadi/demos/empty/src/main.cpp.o:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/home/james/Development/projects/jadi/jadi/demos/empty/src/main.cpp.o
+.PHONY : home/james/Development/projects/jadi/jadi/demos/empty/src/main.cpp.o
 
-Users/diederickhuijbers/c++/jadi/demos/empty/src/main.i: Users/diederickhuijbers/c++/jadi/demos/empty/src/main.cpp.i
-.PHONY : Users/diederickhuijbers/c++/jadi/demos/empty/src/main.i
+home/james/Development/projects/jadi/jadi/demos/empty/src/main.i: home/james/Development/projects/jadi/jadi/demos/empty/src/main.cpp.i
+.PHONY : home/james/Development/projects/jadi/jadi/demos/empty/src/main.i
 
 # target to preprocess a source file
-Users/diederickhuijbers/c++/jadi/demos/empty/src/main.cpp.i:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/Users/diederickhuijbers/c++/jadi/demos/empty/src/main.cpp.i
-.PHONY : Users/diederickhuijbers/c++/jadi/demos/empty/src/main.cpp.i
+home/james/Development/projects/jadi/jadi/demos/empty/src/main.cpp.i:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/home/james/Development/projects/jadi/jadi/demos/empty/src/main.cpp.i
+.PHONY : home/james/Development/projects/jadi/jadi/demos/empty/src/main.cpp.i
 
-Users/diederickhuijbers/c++/jadi/demos/empty/src/main.s: Users/diederickhuijbers/c++/jadi/demos/empty/src/main.cpp.s
-.PHONY : Users/diederickhuijbers/c++/jadi/demos/empty/src/main.s
+home/james/Development/projects/jadi/jadi/demos/empty/src/main.s: home/james/Development/projects/jadi/jadi/demos/empty/src/main.cpp.s
+.PHONY : home/james/Development/projects/jadi/jadi/demos/empty/src/main.s
 
 # target to generate assembly for a file
-Users/diederickhuijbers/c++/jadi/demos/empty/src/main.cpp.s:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/Users/diederickhuijbers/c++/jadi/demos/empty/src/main.cpp.s
-.PHONY : Users/diederickhuijbers/c++/jadi/demos/empty/src/main.cpp.s
+home/james/Development/projects/jadi/jadi/demos/empty/src/main.cpp.s:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/home/james/Development/projects/jadi/jadi/demos/empty/src/main.cpp.s
+.PHONY : home/james/Development/projects/jadi/jadi/demos/empty/src/main.cpp.s
 
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.o: Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.cpp.o
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.o
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Image.o: home/james/Development/projects/jadi/jadi/jadi/src/jadi/Image.cpp.o
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Image.o
 
 # target to build an object file
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.cpp.o:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.cpp.o
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.cpp.o
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Image.cpp.o:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/home/james/Development/projects/jadi/jadi/jadi/src/jadi/Image.cpp.o
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Image.cpp.o
 
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.i: Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.cpp.i
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.i
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Image.i: home/james/Development/projects/jadi/jadi/jadi/src/jadi/Image.cpp.i
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Image.i
 
 # target to preprocess a source file
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.cpp.i:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.cpp.i
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.cpp.i
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Image.cpp.i:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/home/james/Development/projects/jadi/jadi/jadi/src/jadi/Image.cpp.i
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Image.cpp.i
 
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.s: Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.cpp.s
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.s
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Image.s: home/james/Development/projects/jadi/jadi/jadi/src/jadi/Image.cpp.s
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Image.s
 
 # target to generate assembly for a file
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.cpp.s:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.cpp.s
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.cpp.s
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Image.cpp.s:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/home/james/Development/projects/jadi/jadi/jadi/src/jadi/Image.cpp.s
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Image.cpp.s
 
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.o: Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.cpp.o
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.o
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Jadi.o: home/james/Development/projects/jadi/jadi/jadi/src/jadi/Jadi.cpp.o
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Jadi.o
 
 # target to build an object file
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.cpp.o:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.cpp.o
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.cpp.o
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Jadi.cpp.o:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/home/james/Development/projects/jadi/jadi/jadi/src/jadi/Jadi.cpp.o
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Jadi.cpp.o
 
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.i: Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.cpp.i
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.i
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Jadi.i: home/james/Development/projects/jadi/jadi/jadi/src/jadi/Jadi.cpp.i
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Jadi.i
 
 # target to preprocess a source file
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.cpp.i:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.cpp.i
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.cpp.i
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Jadi.cpp.i:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/home/james/Development/projects/jadi/jadi/jadi/src/jadi/Jadi.cpp.i
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Jadi.cpp.i
 
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.s: Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.cpp.s
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.s
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Jadi.s: home/james/Development/projects/jadi/jadi/jadi/src/jadi/Jadi.cpp.s
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Jadi.s
 
 # target to generate assembly for a file
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.cpp.s:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.cpp.s
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.cpp.s
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Jadi.cpp.s:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/home/james/Development/projects/jadi/jadi/jadi/src/jadi/Jadi.cpp.s
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Jadi.cpp.s
 
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.o: Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.cpp.o
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.o
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Math.o: home/james/Development/projects/jadi/jadi/jadi/src/jadi/Math.cpp.o
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Math.o
 
 # target to build an object file
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.cpp.o:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.cpp.o
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.cpp.o
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Math.cpp.o:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/home/james/Development/projects/jadi/jadi/jadi/src/jadi/Math.cpp.o
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Math.cpp.o
 
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.i: Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.cpp.i
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.i
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Math.i: home/james/Development/projects/jadi/jadi/jadi/src/jadi/Math.cpp.i
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Math.i
 
 # target to preprocess a source file
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.cpp.i:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.cpp.i
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.cpp.i
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Math.cpp.i:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/home/james/Development/projects/jadi/jadi/jadi/src/jadi/Math.cpp.i
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Math.cpp.i
 
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.s: Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.cpp.s
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.s
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Math.s: home/james/Development/projects/jadi/jadi/jadi/src/jadi/Math.cpp.s
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Math.s
 
 # target to generate assembly for a file
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.cpp.s:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.cpp.s
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.cpp.s
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Math.cpp.s:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/home/james/Development/projects/jadi/jadi/jadi/src/jadi/Math.cpp.s
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Math.cpp.s
 
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.o: Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.cpp.o
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.o
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Utils.o: home/james/Development/projects/jadi/jadi/jadi/src/jadi/Utils.cpp.o
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Utils.o
 
 # target to build an object file
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.cpp.o:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.cpp.o
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.cpp.o
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Utils.cpp.o:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/home/james/Development/projects/jadi/jadi/jadi/src/jadi/Utils.cpp.o
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Utils.cpp.o
 
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.i: Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.cpp.i
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.i
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Utils.i: home/james/Development/projects/jadi/jadi/jadi/src/jadi/Utils.cpp.i
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Utils.i
 
 # target to preprocess a source file
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.cpp.i:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.cpp.i
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.cpp.i
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Utils.cpp.i:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/home/james/Development/projects/jadi/jadi/jadi/src/jadi/Utils.cpp.i
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Utils.cpp.i
 
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.s: Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.cpp.s
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.s
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Utils.s: home/james/Development/projects/jadi/jadi/jadi/src/jadi/Utils.cpp.s
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Utils.s
 
 # target to generate assembly for a file
-Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.cpp.s:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.cpp.s
-.PHONY : Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.cpp.s
+home/james/Development/projects/jadi/jadi/jadi/src/jadi/Utils.cpp.s:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/home/james/Development/projects/jadi/jadi/jadi/src/jadi/Utils.cpp.s
+.PHONY : home/james/Development/projects/jadi/jadi/jadi/src/jadi/Utils.cpp.s
 
 # Help Target
 help:
@@ -309,24 +312,24 @@ help:
 	@echo "... install/strip"
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
-	@echo "... Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.o"
-	@echo "... Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.i"
-	@echo "... Users/diederickhuijbers/c++/jadi/demos/empty/src/Demo.s"
-	@echo "... Users/diederickhuijbers/c++/jadi/demos/empty/src/main.o"
-	@echo "... Users/diederickhuijbers/c++/jadi/demos/empty/src/main.i"
-	@echo "... Users/diederickhuijbers/c++/jadi/demos/empty/src/main.s"
-	@echo "... Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.o"
-	@echo "... Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.i"
-	@echo "... Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Image.s"
-	@echo "... Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.o"
-	@echo "... Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.i"
-	@echo "... Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Jadi.s"
-	@echo "... Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.o"
-	@echo "... Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.i"
-	@echo "... Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Math.s"
-	@echo "... Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.o"
-	@echo "... Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.i"
-	@echo "... Users/diederickhuijbers/c++/jadi/jadi/src/jadi/Utils.s"
+	@echo "... home/james/Development/projects/jadi/jadi/demos/empty/src/Demo.o"
+	@echo "... home/james/Development/projects/jadi/jadi/demos/empty/src/Demo.i"
+	@echo "... home/james/Development/projects/jadi/jadi/demos/empty/src/Demo.s"
+	@echo "... home/james/Development/projects/jadi/jadi/demos/empty/src/main.o"
+	@echo "... home/james/Development/projects/jadi/jadi/demos/empty/src/main.i"
+	@echo "... home/james/Development/projects/jadi/jadi/demos/empty/src/main.s"
+	@echo "... home/james/Development/projects/jadi/jadi/jadi/src/jadi/Image.o"
+	@echo "... home/james/Development/projects/jadi/jadi/jadi/src/jadi/Image.i"
+	@echo "... home/james/Development/projects/jadi/jadi/jadi/src/jadi/Image.s"
+	@echo "... home/james/Development/projects/jadi/jadi/jadi/src/jadi/Jadi.o"
+	@echo "... home/james/Development/projects/jadi/jadi/jadi/src/jadi/Jadi.i"
+	@echo "... home/james/Development/projects/jadi/jadi/jadi/src/jadi/Jadi.s"
+	@echo "... home/james/Development/projects/jadi/jadi/jadi/src/jadi/Math.o"
+	@echo "... home/james/Development/projects/jadi/jadi/jadi/src/jadi/Math.i"
+	@echo "... home/james/Development/projects/jadi/jadi/jadi/src/jadi/Math.s"
+	@echo "... home/james/Development/projects/jadi/jadi/jadi/src/jadi/Utils.o"
+	@echo "... home/james/Development/projects/jadi/jadi/jadi/src/jadi/Utils.i"
+	@echo "... home/james/Development/projects/jadi/jadi/jadi/src/jadi/Utils.s"
 .PHONY : help
 
 
