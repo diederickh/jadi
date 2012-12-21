@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-set(jadi_base_dir ${CMAKE_CURRENT_LIST_DIR}/../../../)
+set(jadi_base_dir ${CMAKE_CURRENT_LIST_DIR}/../../../jadi/)
 set(jadi_inc_dir ${jadi_base_dir}/include/)
 set(jadi_src_dir ${jadi_base_dir}/src/)
 set(demo_base_dir ${CMAKE_CURRENT_LIST_DIR}/../)
@@ -18,14 +18,21 @@ set(jadi_include_dirs
 
 set(jadi_source_files
   ${jadi_cpp_files}
-  ${demo_cpp_files}
+  ${demo_src_dir}/main.cpp
+  ${demo_src_dir}/Demo.cpp
 )
 
+ #   ${demo_cpp_files}
 if(APPLE) 
-  set(jadi_defines "-DJADI_OSX")
+  set(jadi_defines "-DJADI_PLATFORM=JADI_OSX")
   set(CMAKE_EXE_LINKER_FLAGS " -framework CoreFoundation -framework OpenGL -framework Cocoa -framework IOKit ")
 endif(APPLE)
 
+include_directories(
+  ${jadi_include_dirs}
+)
+
+message(${jadi_include_dirs})
 add_definitions(
   ${jadi_defines}
   "-Wno-invalid-offsetof"
@@ -35,5 +42,5 @@ add_definitions(
 
 get_filename_component(demo_name ${demo_base_dir} NAME)
 message(${jadi_source_files})
-add_executable(${demo_name} ${jadi_source_files})
+add_executable(demo ${jadi_source_files})
 install(TARGETS ${demo_name} DESTINATION ${demo_install_dir})

@@ -1,7 +1,7 @@
 #include "Demo.h"
 
 Demo::Demo() {
-  printf("JADI DEMO.\n");o
+  printf("JADI DEMO.\n");
 }
 
 Demo::~Demo() {

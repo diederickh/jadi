@@ -1,6 +1,7 @@
-#include <jadi/jadi.h>
+#include <jadi/Jadi.h>
 
 int main() {
-  printf("JADI DEMO\n");
+  printf("JADI DEMO\n");        
   return 0;
 }
+
