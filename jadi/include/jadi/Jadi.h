@@ -12,5 +12,6 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <GL/glfw3.h>
 
 #endif

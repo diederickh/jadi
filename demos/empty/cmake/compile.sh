@@ -6,10 +6,6 @@ if [ ! -d ${bd} ] ; then
     mkdir ${bd}
 fi
 
-if [ ! -d ${d}/bin ] ; then 
-    mkdir ${d}/bin
-fi
-
 cd build
 cmake ../ 
 make
