@@ -1,7 +1,7 @@
 #ifndef JADI_DEMO_H
 #define JADI_DEMO_H
 
-#include <jadi/jadi.h>
+#include <jadi/Jadi.h>
 
 class Demo {
  public:
