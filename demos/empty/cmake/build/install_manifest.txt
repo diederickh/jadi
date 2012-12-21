@@ -1,1 +1,0 @@
-/home/james/Development/projects/jadi/jadi/demos/empty/cmake/../bin/demo

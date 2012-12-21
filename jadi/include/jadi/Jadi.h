@@ -6,6 +6,8 @@
 #define JADI_IOS 2
 #define JADI_WIN 3
 
+#define JADI_PLATFORM JADI_WIN
+
 #ifndef JADI_PLATFORM
 #error "ERROR: Define JADI_PLATFORM = {JADI_LINUX, JADI_OSX, JADI_IOS, JADI_WIN}"
 #endif
