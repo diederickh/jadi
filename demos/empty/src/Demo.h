@@ -2,6 +2,7 @@
 #define JADI_DEMO_H
 
 #include <jadi/Jadi.h>
+#include "DepthOfField.h"
 
 class Demo {
  public:
@@ -30,5 +31,7 @@ class Demo {
   GLFWwindow* window;
 
   // custom members
+  Camera cam;
+  DepthOfField dof;
 };
 #endif

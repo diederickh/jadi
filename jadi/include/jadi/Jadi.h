@@ -6,16 +6,27 @@
 #define JADI_IOS 2
 #define JADI_WIN 3
 
-#define JADI_PLATFORM JADI_WIN
-
 #ifndef JADI_PLATFORM
 #error "ERROR: Define JADI_PLATFORM = {JADI_LINUX, JADI_OSX, JADI_IOS, JADI_WIN}"
 #endif
 
 #include <stdio.h>
-#include <iostream>
-#include <opengl/glfw3.h>
-#include <jadi/Math.h>
 #include <stdlib.h>
+#include <iostream>
+//#include <opengl/glew.h> // crashes app on glCreateShader, mac
+#include <opengl/glfw3.h>
+
+#include <jadi/Math.h>
+#include <jadi/OBJ.h>
+#include <jadi/Camera.h>
+
+#if JADI_PLATFORM==JADI_OSX
+#include <openGL/GL.h> 
+#include <openGL/glext.h>
+#define glGenVertexArrays glGenVertexArraysAPPLE
+#define glBindVertexArray glBindVertexArrayAPPLE
+#endif
+
+
 
 #endif

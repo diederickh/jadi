@@ -15,7 +15,6 @@ set(demo_install_dir ${demo_base_dir}bin/)
 file(GLOB_RECURSE jadi_cpp_files ${jadi_src_dir}*.cpp)
 file(GLOB_RECURSE demo_cpp_files ${demo_src_dir}*.cpp)
 
-
 if(APPLE) 
   set(JADI_PLATFORM_MAC TRUE)
   set(jadi_defines "-DJADI_PLATFORM=JADI_OSX")
@@ -39,8 +38,7 @@ set(jadi_include_dirs
 
 set(jadi_source_files
   ${jadi_cpp_files}
-  ${demo_src_dir}/main.cpp
-  ${demo_src_dir}/Demo.cpp
+  ${demo_cpp_files}
 )
 
 if(JADI_PLATFORM_MAC)
@@ -75,6 +73,7 @@ if(JADI_PLATFORM_MAC OR JADI_PLATFORM_LINUX)
     "-Wno-invalid-offsetof"
     "-Wreturn-type"
     "-Werror=return-type"
+    "-ggdb"
   )
 endif(JADI_PLATFORM_MAC OR JADI_PLATFORM_LINUX)
 
