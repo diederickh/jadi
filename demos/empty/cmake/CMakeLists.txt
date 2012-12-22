@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 2.8)
 set(demo_name "demo")
 
 set(jadi_base_dir ${CMAKE_CURRENT_LIST_DIR}/../../../jadi/)
-set(jadi_inc_dir ${jadi_base_dir}/include/)
-set(jadi_src_dir ${jadi_base_dir}/src/)
-set(jadi_lib_dir ${jadi_base_dir}/lib/)
+set(jadi_inc_dir ${jadi_base_dir}include/)
+set(jadi_src_dir ${jadi_base_dir}src/)
+set(jadi_lib_dir ${jadi_base_dir}lib/)
 
 set(demo_base_dir ${CMAKE_CURRENT_LIST_DIR}/../)
 set(demo_src_dir ${demo_base_dir}src/)
@@ -63,6 +63,11 @@ if(JADI_PLATFORM_LINUX)
 endif(JADI_PLATFORM_LINUX)
 
 if(JADI_PLATFORM_WIN)
+  set(jadi_libs 
+    opengl32.lib
+    ${jadi_lib_dir}win/glew32s.lib
+    ${jadi_lib_dir}win/glfw3.lib
+)
 endif(JADI_PLATFORM_WIN)
 
 include_directories(

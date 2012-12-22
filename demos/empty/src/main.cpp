@@ -16,7 +16,6 @@ void key_callback(GLFWwindow window, int key, int action);
 void error_callback(int err, const char* msg);
 void char_callback(GLFWwindow window, int chr);
 
-
 // APPLICATION ENTRY
 // -----------------
 int main() {
@@ -24,7 +23,7 @@ int main() {
   int height = 768;
   demo_ptr = NULL;
 
-  // init
+  //// init
   glfwSetErrorCallback(error_callback);
   if(!glfwInit()) {
     printf("ERROR: cannot initialize GLFW.\n");
