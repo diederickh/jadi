@@ -6,7 +6,7 @@
 #define JADI_IOS 2
 #define JADI_WIN 3
 
-#define JADI_PLATFORM JADI_WIN // need to fix this
+#define JADI_PLATFORM JADI_WIN
 
 #ifndef JADI_PLATFORM
 #error "ERROR: Define JADI_PLATFORM = {JADI_LINUX, JADI_OSX, JADI_IOS, JADI_WIN}"
@@ -20,7 +20,10 @@
 #include <stdio.h>
 #include <iostream>
 #include <stdlib.h>
+
 #include <opengl/glew.h>
 #include <opengl/glfw3.h>
+
+#include <jadi/Math.h>
 
 #endif
