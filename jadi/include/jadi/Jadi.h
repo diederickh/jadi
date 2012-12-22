@@ -13,5 +13,6 @@
 #include <stdio.h>
 #include <iostream>
 #include <opengl/glfw3.h>
+#include <jadi/Math.h>
 
 #endif
