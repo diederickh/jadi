@@ -27,6 +27,10 @@ if(UNIX AND NOT APPLE)
   set(jadi_defines "-DJADI_PLATFORM=JADI_LINUX")
 endif(UNIX AND NOT APPLE)
 
+if(WIN32)
+  set(JADI_PLATFORM_WIN TRUE)
+  set(jadi_defines "-DJADI_PLATFORM=3")
+endif(WIN32)
 
 set(jadi_include_dirs
   ${jadi_inc_dir}
@@ -50,20 +54,29 @@ if(JADI_PLATFORM_LINUX)
   set(jadi_libs 
     ${jadi_lib_dir}linux/libGLEW.a
     ${jadi_lib_dir}linux/libglfw3.a
-    )
+    GL
+    X11
+    Xxf86vm
+    rt
+    pthread
+)
 endif(JADI_PLATFORM_LINUX)
 
+if(JADI_PLATFORM_WIN)
+endif(JADI_PLATFORM_WIN)
 
 include_directories(
   ${jadi_include_dirs}
 )
 
-add_definitions(
-  ${jadi_defines}
-  "-Wno-invalid-offsetof"
-  "-Wreturn-type"
-  "-Werror=return-type"
-)
+if(JADI_PLATFORM_MAC OR JADI_PLATFORM_LINUX)
+  add_definitions(
+    ${jadi_defines}
+    "-Wno-invalid-offsetof"
+    "-Wreturn-type"
+    "-Werror=return-type"
+  )
+endif(JADI_PLATFORM_MAC OR JADI_PLATFORM_LINUX)
 
 add_executable(${demo_name} ${jadi_source_files})
 install(TARGETS ${demo_name} DESTINATION ${demo_install_dir})
