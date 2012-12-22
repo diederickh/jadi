@@ -10,10 +10,14 @@
 #error "ERROR: Define JADI_PLATFORM = {JADI_LINUX, JADI_OSX, JADI_IOS, JADI_WIN}"
 #endif
 
+#if JADI_PLATFORM==JADI_WIN
+#define GLEW_STATIC
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
-//#include <opengl/glew.h> // crashes app on glCreateShader, mac
+
 #include <opengl/glfw3.h>
 
 #include <jadi/Math.h>
