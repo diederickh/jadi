@@ -48,7 +48,7 @@ inline void Vec3::set(const float xx, const float yy, const float zz) {  x = xx;
 inline void Vec3::set(const float s) {  x = s;  y = s;  z = s; }       
 inline float Vec3::length() { return sqrt(x*x + y*y + z*z); }
 inline float Vec3::lengthSquared() {  return x*x + y*y + z*z; }
-inline Vec3& Vec3::normalize() {  float l = length();  x /= l;  y /= l;  z /= l;  return *this; }
+inline Vec3& Vec3::normalize() {  float l = length();  if(l < 0.0001) { return *this; } x /= l;  y /= l;  z /= l;  return *this; }
 inline void Vec3::print() { printf("%f, %f, %f\n", x, y, z); }
 inline const float* Vec3::getPtr() { return &x; }
 inline Vec3 cross(const Vec3& a, const Vec3& b) {  Vec3 d; d.x = (a.y * b.z) - (b.y * a.z); d.y = (a.z * b.x) - (b.z * a.x);  d.z = (a.x * b.y) - (b.x * a.y); return d; }
@@ -86,18 +86,22 @@ inline Vec3 operator*(const Vec3& a, const Vec3& b) { return Vec3(a.x * b.x, a.y
 // 3  7  11  15
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #define SM4(a,b,tmp) t = m[a]; m[a] = m[b]; m[b] = t;
-
+struct Mat3;
 struct Mat4 {
   Mat4();
   Mat4(const Mat4& o);
+  //  Mat4(Mat3& o);
 
   Mat4& operator=(const Mat4& o);
+  Mat4& operator=(Mat3& o);
   Mat4 operator*(const Mat4& o) const;
   Mat4& operator*=(const Mat4& o);
   
   void identity();
   void transpose();
   void translate(const float x, const float y, const float z);
+  void setYRotation(const float radian);
+  void setZRotation(const float radian);
   void scale(const float s);
   void scale(const float x, const float y, const float z);
   void ortho(const float l, const float r, const float b, const float t, const float n, const float f);
@@ -117,6 +121,7 @@ struct Mat4 {
   float m[16];
 };
 
+
 inline Mat4::Mat4() {  memset(m, 0, sizeof(float) * 16);  m[0] = 1.0f;  m[5] = 1.0f;   m[10] = 1.0f; m[15] = 1.0f; }
 inline Mat4::Mat4(const Mat4& o) {  if(this != &o) { memcpy(m, o.m, sizeof(float) * 16); } } 
 inline void Mat4::identity() { memset(m, 0, sizeof(float) * 16);  m[0] = 1.0f;  m[5] = 1.0f;   m[10] = 1.0f; m[15] = 1.0f; }
@@ -130,6 +135,24 @@ inline void Mat4::setPosition(const float x, const float y, const float z) {  m[
 inline void Mat4::print() {  printf("%3.3f, %3.3f, %3.3f, %3.3f\n", m[0], m[4], m[8], m[12]);  printf("%3.3f, %3.3f, %3.3f, %3.3f\n", m[1], m[5], m[9], m[13]);  printf("%3.3f, %3.3f, %3.3f, %3.3f\n", m[2], m[6], m[10], m[14]);  printf("%3.3f, %3.3f, %3.3f, %3.3f\n", m[3], m[7], m[11], m[15]);  printf("\n");}
 inline const float* Mat4::getPtr() { return m; } 
 inline float& Mat4::operator[](const unsigned int dx) { return m[dx]; } 
+
+inline void Mat4::setZRotation(const float radian) {
+  float ca = cos(radian);
+  float sa = sin(radian);
+  m[0] = ca;
+  m[1] = sa;
+  m[4] = -sa;
+  m[5] = ca;
+}
+
+inline void Mat4::setYRotation(const float radian) {
+  float ca = cos(radian);
+  float sa = sin(radian);
+  m[0] = ca;
+  m[2] = -sa;
+  m[8] = sa;
+  m[10] = ca;
+}
 
 inline Mat4 Mat4::rotation(const float radiansX, const float radiansY, const float radiansZ) {
   Mat4 r;
@@ -160,6 +183,15 @@ inline Mat4 Mat4::rotation(const float radiansX, const float radiansY, const flo
   r.m[11] = 0.0f;
   r.m[15] = 1.0f;
   return r;
+}
+
+inline Mat4& Mat4::operator=(const Mat4& o) {
+  if(&o == this) {
+    return *this;
+  }
+
+  memcpy(m, o.m, sizeof(float) * 16);
+  return *this;
 }
 
 inline Mat4 Mat4::operator*(const Mat4& o) const {
@@ -402,6 +434,22 @@ inline Mat3 Mat3::rotation(const float radiansX, const float radiansY, const flo
   return r;
 }
 
+inline Mat4& Mat4::operator=(Mat3& o) {
+  
+  m[0] = o[0];
+  m[1] = o[1];
+  m[2] = o[2];
+
+  m[4] = o[3];
+  m[5] = o[4];
+  m[6] = o[5];
+
+  m[8] = o[6];
+  m[9] = o[7];
+  m[10] = o[8];
+  return *this;
+}
+
 static float sin_zero_half_pi(float a);
 static float atan_positive(float y, float x);
   
@@ -443,6 +491,9 @@ class Quat {
   Quat operator*(const Quat& other) const;
   Quat& operator*=(const Quat& other);
 };
+
+
+inline Quat::Quat(float x, float y, float z, float w ):x(x),y(y),z(z),w(w) {}
 
 inline Quat::Quat(Mat4& m) {
   fromMat4(m);

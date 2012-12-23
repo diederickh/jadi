@@ -3,6 +3,7 @@
 
 #include <jadi/Jadi.h>
 #include "DepthOfField.h"
+#include "Particles.h"
 
 class Demo {
  public:
@@ -32,6 +33,7 @@ class Demo {
 
   // custom members
   Camera cam;
+  Particles ps;
   DepthOfField dof;
 };
 #endif

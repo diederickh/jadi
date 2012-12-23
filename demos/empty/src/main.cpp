@@ -50,6 +50,9 @@ int main() {
   glfwMakeContextCurrent(window);
 
   Demo demo;
+  demo.mouse_x = demo.mouse_y = demo.prev_mouse_x = demo.prev_mouse_y = 0;
+  demo.pressed_mouse_button = 0;
+  demo.is_mouse_down = false;
   demo_ptr = &demo;
   demo.window = &window;
   demo.setup();

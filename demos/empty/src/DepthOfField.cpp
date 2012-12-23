@@ -7,27 +7,35 @@ DepthOfField::~DepthOfField() {
 }
 
 void DepthOfField::setup() {
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_CULL_FACE);
   setupShaders();
   setupBuffers();
 }
 
 void DepthOfField::update() {
+  
 }
 
-void DepthOfField::draw(const float* pm, const float* vm, const float* nm) {
+void DepthOfField::draw(const float* pm, const float* vm, const float* nm, std::vector<Particle>& particles) {
   glUseProgram(debug_prog);
   glBindVertexArray(vao);
 
-  Mat4 mm;
+  //mm.setYRotation(sin(millis() * 0.001) * TWO_PI);
   glUniformMatrix4fv(glGetUniformLocation(debug_prog, "u_pm"), 1, GL_FALSE, pm);
   glUniformMatrix4fv(glGetUniformLocation(debug_prog, "u_vm"), 1, GL_FALSE, vm);
-  glUniformMatrix4fv(glGetUniformLocation(debug_prog, "u_mm"), 1, GL_FALSE, mm.getPtr());
-  glDrawArrays(GL_TRIANGLES, 0, num_vertices);
+
+  for(std::vector<Particle>::iterator it = particles.begin(); it != particles.end(); ++it) {
+    Particle& p = *it;
+    mm.setPosition(p.position.x, p.position.y, p.position.z);
+    glUniformMatrix4fv(glGetUniformLocation(debug_prog, "u_mm"), 1, GL_FALSE, mm.getPtr());
+    glDrawArrays(GL_TRIANGLES, 0, num_vertices);
+  }
 }
 
 
 void DepthOfField::setupShaders() {
-  // create debug shader.
+  // DEBUG SHADER
   GLuint vert_id = glCreateShader(GL_VERTEX_SHADER);
   GLuint frag_id = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(vert_id, 1, &DOF_DEBUG_VS, NULL);
@@ -49,6 +57,7 @@ void DepthOfField::setupBuffers() {
   float* vertices;
   num_vertices = load_obj_file("sphere.obj", &vertices, true);
   glBufferData(GL_ARRAY_BUFFER,  num_vertices * 6 * sizeof(float), vertices, GL_STATIC_DRAW);
+  delete[] vertices;
 
   GLint pos = glGetAttribLocation(debug_prog, "a_pos");
   GLint norm = glGetAttribLocation(debug_prog, "a_norm");

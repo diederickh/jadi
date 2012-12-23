@@ -8,7 +8,9 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string>
+#include <float.h>
 #include <jadi/OBJ.h>
+
 
 #if JADI_PLATFORM == JADI_OSX
 #include <libgen.h> /* dirname */
@@ -183,23 +185,42 @@ static std::string to_data_path(const std::string filename) {
   return exepath;
 }
 
-#endif
 
-// Simple wrapper which loads an object file from the data path, returns number of vertices
-static size_t load_obj_file(const std::string& filename, float** result, bool useNormals) {
-  printf("load obj file\n");
-  OBJ obj;
-  printf("?");
-  if(!obj.load(to_data_path(filename))) {
-    *result = NULL;
-    return 0;
+static uint64_t millis(void) {
+  mach_timebase_info_data_t info;
+  if (mach_timebase_info(&info) != KERN_SUCCESS) {
+    abort();
   }
-  printf("2\n");
-  return obj.getVertices(result, useNormals);
+  return (mach_absolute_time() * info.numer / info.denom) / 1000000;
 }
 
 
 
+#endif
 
+// Simple wrapper which loads an object file from the data path, returns number of vertices
+static size_t load_obj_file(const std::string& filename, float** result, bool useNormals) {
+  OBJ obj;
+  if(!obj.load(to_data_path(filename))) {
+    *result = NULL;
+    return 0;
+  }
+  return obj.getVertices(result, useNormals);
+}
+
+static float random(float max) {
+  return max * rand() / (RAND_MAX + 1.0f);
+}
+
+static float random(float x, float y) {
+  float high = 0;
+  float low = 0;
+  float result = 0;
+	
+  high = std::max<float>(x,y);
+  low = std::min<float>(x,y);
+  result = low + ((high-low) * rand()/(RAND_MAX + 1.0));
+  return result;
+}
 
 #endif 
