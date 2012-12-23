@@ -1,15 +1,15 @@
 #include "Particles.h"
 
 Particles::Particles() {
-  zone_radius = 30;
+  zone_radius = 10;
   lower_threshold = 0.5;
   higher_threshold = 0.8;
   repel_strength = 0.001;
   align_strength = 0.001;
   attract_strength = 0.001;
-  radius = 50.0f;
-  min_speed = 1.1f;
-  max_speed = 2.5f;
+  radius = 20.0f;
+  min_speed = 0.1f;
+  max_speed = 0.5f;
   last_time = 0;
   time_accum = 0;
   last_time = 0;
@@ -42,9 +42,10 @@ void Particles::integrate() {
     ls = dir.lengthSquared();
     if(ls > radius_sq) {
       dir.normalize();
-      dir *= (ls - radius_sq) * 0.00025f;
+      dir *= (ls - radius_sq) * 0.0025f;
       a.forces += dir;
     }
+
     Vec3 r(random(-s,s),random(-s,s),random(-s,s));
     a.forces += r;
     std::vector<Particle>::iterator itb = ita;
