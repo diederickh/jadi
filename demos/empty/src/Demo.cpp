@@ -31,6 +31,7 @@ void Demo::draw() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   const float* pm = cam.pm().getPtr();
   const float* vm = cam.vm().getPtr();
+
   {
     dof.beginScenePass();
     dof.draw(pm, vm, NULL, ps.particles);

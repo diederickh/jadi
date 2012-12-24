@@ -50,7 +50,8 @@ static const char* DOF_SCENE_VS = GLSL(120,
 static const char* DOF_SCENE_FS = GLSL(120,
   varying vec3 v_norm;
   void main() {
-    gl_FragData[0] = vec4(v_norm, 1.0); 
+    gl_FragData[0] = vec4(0.5 + 0.5 * v_norm, 1.0); 
+    
   }
 );
 
@@ -98,11 +99,24 @@ static const char* DOF_IMAGE_FS = GLSL(120,
   void main() {
     vec4 col = texture2D(u_tex, v_tex);
     gl_FragColor = col;
-    // gl_FragColor = 0.5 + (0.5 * col);
-    //    gl_FragColor.rgb = vec3(col.r);
     gl_FragColor.a = 1.0;
   }
 );
+
+// FRAGMENT SHADER TO DRAW DEPTH BUFFER TEXTURE (DEBUG)
+// -----------------------------------------------------------
+static const char* DOF_DEBUG_DEPTH_IMAGE_FS = GLSL(120,
+  uniform sampler2D u_tex;
+  varying vec2 v_tex;
+  void main() {
+    vec4 col = texture2D(u_tex, v_tex);
+    gl_FragColor = col;
+    float d = pow(col.r, 70.0); // gamma correct to draw depth texture
+    gl_FragColor = vec4(d);
+    gl_FragColor.a = 1.0;
+  }
+);
+
 
 class DepthOfField {
  public:
@@ -121,7 +135,7 @@ class DepthOfField {
   void setupFBO();
   GLuint createProgram(const char* vs, const char* fs);
   GLuint createTexture(int w, int h, GLenum iformat, GLenum eformat);
-  void drawTexture(GLuint tex, int x, int y, int w, int h);
+  void drawTexture(GLuint prog, GLuint tex, int x, int y, int w, int h);
  public:
 
   int fbo_w;
@@ -130,12 +144,9 @@ class DepthOfField {
   size_t num_vertices;
   
   GLuint debug_prog;
+  GLuint debug_depth_prog; // used to draw depth buffer.
   GLuint scene_prog; // captures the scene
   GLuint blur0_prog; // first blur step
-
-  bool use_textures;
-  GLuint depth_rbo; 
-  GLuint color_rbo;
 
   // Used to draw particles
   GLuint vbo;

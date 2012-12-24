@@ -29,6 +29,9 @@
 #if JADI_PLATFORM == JADI_OSX
 #include <openGL/GL.h> 
 #include <openGL/glext.h>
+
+#undef glGenVertexArrays
+#undef glBindVertexArray
 #define glGenVertexArrays glGenVertexArraysAPPLE
 #define glBindVertexArray glBindVertexArrayAPPLE
 #endif

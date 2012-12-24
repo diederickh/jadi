@@ -37,17 +37,10 @@ void DepthOfField::draw(const float* pm, const float* vm, const float* nm, std::
 }
 
 void DepthOfField::debugDraw() {
-  if(use_textures) {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDrawBuffer(GL_BACK_LEFT);
-    drawTexture(scene_tex, 0,240,320,240);
-    drawTexture(depth_tex, 0,0,320,240);
-  }
-  else {
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
-    glReadBuffer(GL_COLOR_ATTACHMENT0);
-    glBlitFramebuffer(0,0,fbo_w, fbo_h, 0,0,fbo_w, fbo_h, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-  }
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glDrawBuffer(GL_BACK_LEFT);
+  drawTexture(image_prog, scene_tex, 0,384,512,384);
+  drawTexture(debug_depth_prog, depth_tex, 0,0,512,384);
 }
 
 
@@ -73,42 +66,34 @@ void DepthOfField::setupFBO() {
   glGenFramebuffers(1, &fbo);
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 
-  //depth_tex = createTexture(fbo_w, fbo_h, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT);
-  use_textures = true;
-  if(use_textures) {
-    glGenTextures(1, &depth_tex);
-    glBindTexture(GL_TEXTURE_2D, depth_tex);
-    glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, fbo_w, fbo_h, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_tex, 0);
+  // Depth buffer texture
+  glGenTextures(1, &depth_tex);
+  glBindTexture(GL_TEXTURE_2D, depth_tex);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, fbo_w, fbo_h, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+  glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_tex, 0);
 
-    glGenTextures(1, &scene_tex);
-    glBindTexture(GL_TEXTURE_2D, scene_tex);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fbo_w, fbo_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, scene_tex, 0);
+  // Scene texture
+  glGenTextures(1, &scene_tex);
+  glBindTexture(GL_TEXTURE_2D, scene_tex);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fbo_w, fbo_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+  glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, scene_tex, 0);
 
-    glGenTextures(1, &blur0_tex);
-    glBindTexture(GL_TEXTURE_2D, blur0_tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fbo_w, fbo_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, blur0_tex, 0);
-  }
-  else {
-    glGenRenderbuffers(1, &depth_rbo);
-    glBindRenderbuffer(GL_RENDERBUFFER, depth_rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, fbo_w, fbo_h);
-    glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_rbo);
-
-    glGenRenderbuffers(1, &color_rbo);
-    glBindRenderbuffer(GL_RENDERBUFFER, color_rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, fbo_w, fbo_h);
-    glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, color_rbo);
-  }
+  // H-blur texture
+  glGenTextures(1, &blur0_tex);
+  glBindTexture(GL_TEXTURE_2D, blur0_tex);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fbo_w, fbo_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+  glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, blur0_tex, 0);
 
   eglCheckFramebufferStatus();
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -149,6 +134,7 @@ void DepthOfField::setupBuffers() {
     s, s, 1.0f, 1.0f,
     -s, s, 0.0f, 1.0f
   };
+
   glBufferData(GL_ARRAY_BUFFER, sizeof(img_verts), img_verts, GL_STATIC_DRAW);
   pos = glGetAttribLocation(image_prog, "a_pos");
   GLint tex = glGetAttribLocation(image_prog, "a_tex");
@@ -160,6 +146,7 @@ void DepthOfField::setupBuffers() {
 
 void DepthOfField::setupShaders() {
   debug_prog = createProgram(DOF_DEBUG_VS, DOF_DEBUG_FS); // debug: draw the scene using a debug shader
+  debug_depth_prog = createProgram(DOF_IMAGE_VS, DOF_DEBUG_DEPTH_IMAGE_FS); // debug: draw depth texture with gamma correction
   image_prog = createProgram(DOF_IMAGE_VS, DOF_IMAGE_FS); // debug: draw an image quad, just draw a texture
   scene_prog = createProgram(DOF_SCENE_VS, DOF_SCENE_FS); // dof step 0: renders the scene 
 }
@@ -190,9 +177,9 @@ GLuint DepthOfField::createTexture(int w, int h, GLenum iformat, GLenum eformat)
   return tex;
 }
 
-void DepthOfField::drawTexture(GLuint tex, int x, int y, int w, int h) {
+void DepthOfField::drawTexture(GLuint prog, GLuint tex, int x, int y, int w, int h) {
   glBindVertexArray(image_vao);
-  glUseProgram(image_prog);
+  glUseProgram(prog);
   
   glViewport(x,y,w,h); 
 
@@ -202,5 +189,4 @@ void DepthOfField::drawTexture(GLuint tex, int x, int y, int w, int h) {
 
   glDrawArrays(GL_TRIANGLES, 0, 6);
   glViewport(0,0,fbo_w, fbo_h);
-
 }
