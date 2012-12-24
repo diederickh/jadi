@@ -5,6 +5,8 @@
 #include <vector>
 #include "Particles.h"
 
+// DEBUG SHADER 
+// -----------------------------------------------
 static const char* DOF_DEBUG_VS = GLSL(120, 
   uniform mat4 u_pm;
   uniform mat4 u_vm;
@@ -27,7 +29,11 @@ static const char* DOF_DEBUG_FS = GLSL(120,
   }
 );
 
-static const char* DOF_DEPTH_VS = GLSL(120,
+
+// STEP 1: CAPTURE DIFFUSE, RENDER DEPTH INTO DEPTH ATTACHMENT
+// attachment 0 = color
+// -----------------------------------------------------------
+static const char* DOF_SCENE_VS = GLSL(120,
   uniform mat4 u_pm;
   uniform mat4 u_vm;
   uniform mat4 u_mm;
@@ -35,26 +41,48 @@ static const char* DOF_DEPTH_VS = GLSL(120,
   attribute vec3 a_norm;
   varying vec4 v_pos;
   varying vec3 v_norm;
-  const float n = 0.1;
-  const float f = 500.0f;
-
   void main() {
     gl_Position = u_pm * u_vm * u_mm * a_pos;
-    v_pos = gl_Position;
     v_norm = a_norm;
   }
 );
 
-static const char* DOF_DEPTH_FS = GLSL(120,
+static const char* DOF_SCENE_FS = GLSL(120,
   varying vec3 v_norm;
-  varying vec4 v_pos;
   void main() {
-    gl_FragColor.a = 1.0;
-    gl_FragColor.rgb = vec3(v_pos.z, v_pos.z, v_pos.z);
+    gl_FragData[0] = vec4(v_norm, 1.0); 
   }
 );
 
+
+// STEP 2: APPLY H-BLUR
+// -----------------------------------------------------------
+static const char* DOF_BLUR0_VS = GLSL(120,
+  uniform mat4 u_pm;
+  attribute vec4 a_pos;
+  attribute vec2 a_tex;
+  varying vec2 v_tex;
+  void main() {
+    gl_Position = a_pos;
+    v_tex = a_tex;
+  }
+);
+
+static const char* DOF_BLUR0_FS = GLSL(120,
+  uniform sampler2D u_depth_tex;
+  uniform sampler2D u_diffuse_tex;
+  varying vec2 v_tex;
+  void main() {
+    vec4 col = texture2D(u_tex, v_tex);
+    gl_FragColor = col;
+  }
+);
+
+
+// DRAWING THE CONTENTS OF A TEXTURE
+// -----------------------------------------------------------
 static const char* DOF_IMAGE_VS = GLSL(120,
+  uniform mat4 u_pm;
   attribute vec4 a_pos;
   attribute vec2 a_tex;
   varying vec2 v_tex;
@@ -70,6 +98,9 @@ static const char* DOF_IMAGE_FS = GLSL(120,
   void main() {
     vec4 col = texture2D(u_tex, v_tex);
     gl_FragColor = col;
+    // gl_FragColor = 0.5 + (0.5 * col);
+    //    gl_FragColor.rgb = vec3(col.r);
+    gl_FragColor.a = 1.0;
   }
 );
 
@@ -79,8 +110,9 @@ class DepthOfField {
   ~DepthOfField();
   void setup(int w, int h);
   void update();
-  void beginDepthPass();
-  void endDepthPass();
+  void beginScenePass();
+  void endScenePass();
+  void applyDOF();
   void debugDraw();
   void draw(const float* pm, const float* vm, const float* nm, std::vector<Particle>& particles);
  private:
@@ -95,16 +127,30 @@ class DepthOfField {
   int fbo_w;
   int fbo_h;
   Mat4 mm;
-
+  size_t num_vertices;
+  
   GLuint debug_prog;
-  GLuint depth_prog;
+  GLuint scene_prog; // captures the scene
+  GLuint blur0_prog; // first blur step
+
+  bool use_textures;
+  GLuint depth_rbo; 
+  GLuint color_rbo;
+
+  // Used to draw particles
   GLuint vbo;
   GLuint vao;
-  size_t num_vertices;
   GLuint fbo;
-  GLuint depth_rbo;
-  GLuint depth_tex;
+  
 
+  // textures
+  GLuint depth_tex;
+  GLuint scene_tex;
+  GLuint blur0_tex;
+  GLuint blur1_tex;
+
+
+  // debug drawing.
   GLuint image_prog;
   GLuint image_vao;
   GLuint image_vbo;

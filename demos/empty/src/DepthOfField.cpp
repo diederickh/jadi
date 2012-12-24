@@ -22,6 +22,7 @@ void DepthOfField::update() {
 
 void DepthOfField::draw(const float* pm, const float* vm, const float* nm, std::vector<Particle>& particles) {
   glUseProgram(debug_prog);// testing...
+  glUseProgram(scene_prog);
   glBindVertexArray(vao);
 
   glUniformMatrix4fv(glGetUniformLocation(debug_prog, "u_pm"), 1, GL_FALSE, pm);
@@ -36,40 +37,81 @@ void DepthOfField::draw(const float* pm, const float* vm, const float* nm, std::
 }
 
 void DepthOfField::debugDraw() {
-  glReadBuffer(GL_COLOR_ATTACHMENT0);
-  glBlitFramebuffer(0,0,fbo_w, fbo_h, 0,0,fbo_w, fbo_h, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+  if(use_textures) {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDrawBuffer(GL_BACK_LEFT);
+    drawTexture(scene_tex, 0,240,320,240);
+    drawTexture(depth_tex, 0,0,320,240);
+  }
+  else {
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+    glReadBuffer(GL_COLOR_ATTACHMENT0);
+    glBlitFramebuffer(0,0,fbo_w, fbo_h, 0,0,fbo_w, fbo_h, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+  }
 }
 
-void DepthOfField::beginDepthPass() {
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+
+void DepthOfField::beginScenePass() {
+  glBindFramebuffer(GL_FRAMEBUFFER, fbo);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glDrawBuffer(GL_COLOR_ATTACHMENT0);
-  glUseProgram(depth_prog);
+  glUseProgram(scene_prog);
   glViewport(0,0,fbo_w, fbo_h);
 }
 
-void DepthOfField::endDepthPass() {
+void DepthOfField::endScenePass() {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glDrawBuffer(GL_BACK_LEFT);
 }
 
-void DepthOfField::setupShaders() {
-  debug_prog = createProgram(DOF_DEBUG_VS, DOF_DEBUG_FS);
-  depth_prog = createProgram(DOF_DEPTH_VS, DOF_DEPTH_FS);
-  image_prog = createProgram(DOF_IMAGE_VS, DOF_IMAGE_FS);
+void DepthOfField::applyDOF() {
+  //  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+  //  glDrawBuffer(GL_COLOR_ATTACHMENT1);
 }
 
-GLuint DepthOfField::createProgram(const char* vs, const char* fs) {
-  GLuint vert_id = glCreateShader(GL_VERTEX_SHADER);
-  GLuint frag_id = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(vert_id, 1, &vs, NULL);
-  glShaderSource(frag_id, 1, &fs, NULL);
-  glCompileShader(vert_id); eglGetShaderInfoLog(vert_id);
-  glCompileShader(frag_id); eglGetShaderInfoLog(frag_id);
-  GLuint prog = glCreateProgram();
-  glAttachShader(prog, vert_id);
-  glAttachShader(prog, frag_id);
-  glLinkProgram(prog);
-  return prog;
+void DepthOfField::setupFBO() {
+  glGenFramebuffers(1, &fbo);
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+
+  //depth_tex = createTexture(fbo_w, fbo_h, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT);
+  use_textures = true;
+  if(use_textures) {
+    glGenTextures(1, &depth_tex);
+    glBindTexture(GL_TEXTURE_2D, depth_tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, fbo_w, fbo_h, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_tex, 0);
+
+    glGenTextures(1, &scene_tex);
+    glBindTexture(GL_TEXTURE_2D, scene_tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fbo_w, fbo_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, scene_tex, 0);
+
+    glGenTextures(1, &blur0_tex);
+    glBindTexture(GL_TEXTURE_2D, blur0_tex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fbo_w, fbo_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, blur0_tex, 0);
+  }
+  else {
+    glGenRenderbuffers(1, &depth_rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, depth_rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, fbo_w, fbo_h);
+    glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_rbo);
+
+    glGenRenderbuffers(1, &color_rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, color_rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, fbo_w, fbo_h);
+    glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, color_rbo);
+  }
+
+  eglCheckFramebufferStatus();
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void DepthOfField::setupBuffers() {
@@ -116,21 +158,24 @@ void DepthOfField::setupBuffers() {
   glVertexAttribPointer(tex, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (GLvoid*)8);
 }
 
-void DepthOfField::setupFBO() {
-  glGenFramebuffers(1, &fbo);
-  glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+void DepthOfField::setupShaders() {
+  debug_prog = createProgram(DOF_DEBUG_VS, DOF_DEBUG_FS); // debug: draw the scene using a debug shader
+  image_prog = createProgram(DOF_IMAGE_VS, DOF_IMAGE_FS); // debug: draw an image quad, just draw a texture
+  scene_prog = createProgram(DOF_SCENE_VS, DOF_SCENE_FS); // dof step 0: renders the scene 
+}
 
-  depth_tex = createTexture(fbo_w, fbo_h, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_tex, 0);
-  
-  GLuint rbo;
-  glGenRenderbuffers(1, &rbo);
-  glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, fbo_w, fbo_h);
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, rbo);
-
-  eglCheckFramebufferStatus();
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+GLuint DepthOfField::createProgram(const char* vs, const char* fs) {
+  GLuint vert_id = glCreateShader(GL_VERTEX_SHADER);
+  GLuint frag_id = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(vert_id, 1, &vs, NULL);
+  glShaderSource(frag_id, 1, &fs, NULL);
+  glCompileShader(vert_id); eglGetShaderInfoLog(vert_id);
+  glCompileShader(frag_id); eglGetShaderInfoLog(frag_id);
+  GLuint prog = glCreateProgram();
+  glAttachShader(prog, vert_id);
+  glAttachShader(prog, frag_id);
+  glLinkProgram(prog);
+  return prog;
 }
 
 GLuint DepthOfField::createTexture(int w, int h, GLenum iformat, GLenum eformat) {
@@ -148,11 +193,14 @@ GLuint DepthOfField::createTexture(int w, int h, GLenum iformat, GLenum eformat)
 void DepthOfField::drawTexture(GLuint tex, int x, int y, int w, int h) {
   glBindVertexArray(image_vao);
   glUseProgram(image_prog);
+  
+  glViewport(x,y,w,h); 
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, tex);
   glUniform1i(glGetUniformLocation(image_prog, "u_tex"), 0);
 
   glDrawArrays(GL_TRIANGLES, 0, 6);
-  
+  glViewport(0,0,fbo_w, fbo_h);
+
 }

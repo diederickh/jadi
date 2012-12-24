@@ -105,6 +105,8 @@ struct Mat4 {
   void scale(const float s);
   void scale(const float x, const float y, const float z);
   void ortho(const float l, const float r, const float b, const float t, const float n, const float f);
+  void orthoTopLeft(const float w, const float h, const float n, const float f);
+  void orthoBottomLeft(const float w, const float h, const float n, const float f);
   void frustum(const float l, const float r, const float b, const float t, const float n, const float f);
   void perspective(const float fov, const float aspect, const float n, const float f);
   
@@ -292,6 +294,13 @@ inline void Mat4::ortho(const float l, const float r, const float b, const float
   m[14] = -(f+n)/fmn;
 }
 
+inline void Mat4::orthoTopLeft(const float w, const float h, const float n, const float f) {
+  ortho(0.0f, w, h, 0.0f, n, f);
+}
+
+inline void Mat4::orthoBottomLeft(const float w, const float h, const float n, const float f) {
+  ortho(0.0f, w, 0.0, h, n, f);
+}
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Mat3, column major
 // 0  3  6 

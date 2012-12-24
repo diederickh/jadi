@@ -9,8 +9,8 @@ Demo::~Demo() {
 void Demo::setup() {
   dof.setup(1024, 768);
   cam.setupArcball(1024, 768);
-  cam.setPerspective(60.0f, 4.0f/3.0f, 0.1, 500.0f);
-  cam.setPosition(0,0,150);
+  cam.setPerspective(60.0f, 4.0f/3.0f, 0.1,350.0f);
+  cam.setPosition(0,0,50);
 
   float s = 80.0f;
   ps.particles.insert(ps.particles.begin(), 50, Particle());
@@ -31,9 +31,14 @@ void Demo::draw() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   const float* pm = cam.pm().getPtr();
   const float* vm = cam.vm().getPtr();
-  dof.beginDepthPass();
-  dof.draw(pm, vm, NULL, ps.particles);
-  dof.endDepthPass();
+  {
+    dof.beginScenePass();
+    dof.draw(pm, vm, NULL, ps.particles);
+    dof.endScenePass();
+  }
+  {
+    dof.applyDOF();
+  }
   dof.debugDraw();
 }
 
