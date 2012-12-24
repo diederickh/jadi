@@ -28,7 +28,7 @@ int main() {
   //// init
   glfwSetErrorCallback(error_callback);
   if(!glfwInit()) {
-    fprintf(stderr, "GLFW Error: %s\n", glfwGetError());
+    fprintf(stderr, "GLFW Error: %d\n", glfwGetError());
     exit(EXIT_FAILURE);
   }
 
