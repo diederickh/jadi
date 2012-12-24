@@ -28,7 +28,7 @@ endif(UNIX AND NOT APPLE)
 
 if(WIN32)
   set(JADI_PLATFORM_WIN TRUE)
-  set(jadi_defines "-DJADI_PLATFORM=3")
+  set(jadi_defines "-DJADI_PLATFORM=JADI_WIN")
 endif(WIN32)
 
 set(jadi_include_dirs
@@ -81,6 +81,12 @@ if(JADI_PLATFORM_MAC OR JADI_PLATFORM_LINUX)
     "-ggdb"
   )
 endif(JADI_PLATFORM_MAC OR JADI_PLATFORM_LINUX)
+
+if(JADI_PLATFORM_WIN)
+  add_definitions(
+    ${jadi_defines}
+  )
+endif(JADI_PLATFORM_WIN)
 
 add_executable(${demo_name} ${jadi_source_files})
 install(TARGETS ${demo_name} DESTINATION ${demo_install_dir})
