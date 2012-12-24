@@ -27,6 +27,13 @@
 #include <unistd.h>  /* sysconf */
 #endif
 
+#if JADI_PLATFORM == JADI_LINUX 
+#include <unistd.h> /* readlink */
+#include <sys/time.h> /* timeofday */
+#include <libgen.h> /* dirname */
+#define MAX_PATH 4096
+#endif
+
 
 #ifndef PI
 #define PI 3.14159265358979323846
@@ -151,46 +158,75 @@ static float fast_sqrt(float x) {
   r = r * ( 1.5f - r * r * y ); 
   return r; 
 }
-
+/*
 static std::string get_data_path() {
+
 }
+*/
 
 #if JADI_PLATFORM == JADI_WIN
+// -------------------------------------- WIN ---------------------------------------
 static std::string get_exe_path() {
-	char buffer[MAX_PATH];
+  char buffer[MAX_PATH];
 
-	// Try to get the executable path with a buffer of MAX_PATH characters.
-	DWORD result = ::GetModuleFileNameA(nullptr, buffer, static_cast<DWORD>(MAX_PATH));
-	if (result) {
-		return "";
-	}
+  // Try to get the executable path with a buffer of MAX_PATH characters.
+  DWORD result = ::GetModuleFileNameA(nullptr, buffer, static_cast<DWORD>(MAX_PATH));
+  if (result) {
+    return "";
+  }
 
-	std::string::size_type pos = std::string(buffer).find_last_of( "\\/" );
-	return std::string(buffer).substr(0, pos);
-}
-
-static std::string to_data_path(const std::string filename) {
-	std::string exepath = get_exe_path();
-	exepath += "data/" +filename;
-	return exepath;
+  std::string::size_type pos = std::string(buffer).find_last_of( "\\/" );
+  return std::string(buffer).substr(0, pos);
 }
 
 static uint64_t millis(void) {
-	static LARGE_INTEGER s_frequency;
-	static BOOL s_use_qpc = QueryPerformanceFrequency(&s_frequency);
-	if (s_use_qpc) {
-		LARGE_INTEGER now;
-		QueryPerformanceCounter(&now);
-		return (1000LL * now.QuadPart) / s_frequency.QuadPart;
-	} else {
-		return GetTickCount();
-	}
+  static LARGE_INTEGER s_frequency;
+  static BOOL s_use_qpc = QueryPerformanceFrequency(&s_frequency);
+  if (s_use_qpc) {
+    LARGE_INTEGER now;
+    QueryPerformanceCounter(&now);
+    return (1000LL * now.QuadPart) / s_frequency.QuadPart;
+  } else {
+    return GetTickCount();
+  }
 }
-
+// -------------------------------------- WIN ---------------------------------------
 #endif
 
 
-#if JADI_PLATFORM == JADI_OSX
+#if JADI_PLATFORM == JADI_LINUX 
+// -------------------------------------- LINUX -------------------------------------
+static std::string get_exe_path() {
+  char buffer[MAX_PATH];
+  size_t size = MAX_PATH;
+  ssize_t n = readlink("/proc/self/exe", buffer, size - 1);
+  if (n <= 0) {
+    return "";
+  }
+  buffer[n] = '\0';
+
+
+  const char* dn = dirname(buffer);
+  size = strlen(dn);
+  std::string ret(dn, size) ;
+  ret.push_back('/');
+  return ret;
+}
+
+static uint64_t millis() {
+  timeval time;
+  gettimeofday(&time, NULL);
+  uint64_t n = time.tv_usec;
+  n /= 1000; // convert seconds to millis
+  n += (time.tv_sec * 1000); // convert micros to millis
+  return n;
+}
+
+// -------------------------------------- LINUX -------------------------------------
+#endif
+
+#if JADI_PLATFORM == JADI_OSX 
+// -------------------------------------- OSX ---------------------------------------
 static std::string get_exe_path() {
   char buffer[1024];
   uint32_t usize = sizeof(buffer);;
@@ -234,8 +270,15 @@ static uint64_t millis(void) {
   }
   return (mach_absolute_time() * info.numer / info.denom) / 1000000;
 }
-
+// -------------------------------------- OSX ---------------------------------------
 #endif
+
+
+static std::string to_data_path(const std::string filename) {
+  std::string exepath = get_exe_path();
+  exepath += "data/" +filename;
+  return exepath;
+}
 
 // Simple wrapper which loads an object file from the data path, returns number of vertices
 static size_t load_obj_file(const std::string& filename, float** result, bool useNormals) {
