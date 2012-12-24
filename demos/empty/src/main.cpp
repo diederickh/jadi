@@ -4,6 +4,7 @@
 #include "Demo.h"
 
 Demo* demo_ptr;
+bool  is_running;
 
 // CALLBACKS
 // ---------
@@ -22,16 +23,24 @@ int main() {
   int width = 1024;
   int height = 768;
   demo_ptr = NULL;
+  is_running = true;
 
   //// init
   glfwSetErrorCallback(error_callback);
   if(!glfwInit()) {
-    printf("ERROR: cannot initialize GLFW.\n");
+    fprintf(stderr, "GLFW Error: %s\n", glfwGetError());
     exit(EXIT_FAILURE);
   }
 
   glfwWindowHint(GLFW_DEPTH_BITS, 16);
   glfwWindowHint(GLFW_FSAA_SAMPLES, 4);
+
+  //#if JADI_PLATFORM != JADI_OSX
+  // doesn't work if we specify 3.2 - errors on line 78 of DepthOfField.cpp (GL_INVALID_ENUM)
+  //glfwWindowHint( GLFW_OPENGL_VERSION_MAJOR, 3 );
+  //glfwWindowHint( GLFW_OPENGL_VERSION_MINOR, 2 );
+  //glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+  //#endif
 
   GLFWwindow window = glfwCreateWindow(width, height, GLFW_WINDOWED, "Simulation", NULL);
   if(!window) {
@@ -49,6 +58,17 @@ int main() {
 
   glfwMakeContextCurrent(window);
 
+  #if JADI_PLATFORM==JADI_OSX
+    glewExperimental = true;
+  #endif
+
+  GLenum err = glewInit();
+  if (GLEW_OK != err) {
+	  fprintf(stderr, "GLEW Error: %s\n", glewGetErrorString(err));
+	  exit(EXIT_FAILURE);
+  }
+
+
   Demo demo;
   demo.mouse_x = demo.mouse_y = demo.prev_mouse_x = demo.prev_mouse_y = 0;
   demo.pressed_mouse_button = 0;
@@ -57,16 +77,17 @@ int main() {
   demo.window = &window;
   demo.setup();
   
-  bool running = true;
-  while(running) {
+  while(is_running) {
     glfwPollEvents();
 
     demo.update();
     demo.draw();
 
     glfwSwapBuffers(window);
-    running = !(glfwGetKey(window, GLFW_KEY_ESC));
   }
+
+  demo_ptr->onWindowClose();
+
   glfwTerminate();
   exit(EXIT_SUCCESS);
 };
@@ -81,7 +102,7 @@ void window_size_callback(GLFWwindow window, int w, int h) {
 
 int window_close_callback(GLFWwindow window) {
   if(demo_ptr) {
-    demo_ptr->onWindowClose();
+	is_running = false;
   }
   return GL_TRUE;
 }
@@ -136,6 +157,11 @@ void key_callback(GLFWwindow window, int key, int action) {
   if(!demo_ptr) {
     return;
   }
+
+  if(key == GLFW_KEY_ESC) {
+	is_running = false;
+  }
+
   if(action == GLFW_PRESS) {
     demo_ptr->onKeyDown(key);
   }

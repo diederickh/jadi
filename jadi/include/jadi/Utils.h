@@ -9,8 +9,12 @@
 #include <stdint.h>
 #include <string>
 #include <float.h>
+#include <jadi/Jadi.h>
 #include <jadi/OBJ.h>
 
+#if JADI_PLATFORM == JADI_WIN
+#include <Windows.h>
+#endif
 
 #if JADI_PLATFORM == JADI_OSX
 #include <libgen.h> /* dirname */
@@ -26,6 +30,10 @@
 
 #ifndef PI
 #define PI 3.14159265358979323846
+#endif
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
 #endif
 
 #ifndef TWO_PI
@@ -147,6 +155,40 @@ static float fast_sqrt(float x) {
 static std::string get_data_path() {
 }
 
+#if JADI_PLATFORM == JADI_WIN
+static std::string get_exe_path() {
+	char buffer[MAX_PATH];
+
+	// Try to get the executable path with a buffer of MAX_PATH characters.
+	DWORD result = ::GetModuleFileNameA(nullptr, buffer, static_cast<DWORD>(MAX_PATH));
+	if (result) {
+		return "";
+	}
+
+	std::string::size_type pos = std::string(buffer).find_last_of( "\\/" );
+	return std::string(buffer).substr(0, pos);
+}
+
+static std::string to_data_path(const std::string filename) {
+	std::string exepath = get_exe_path();
+	exepath += "data/" +filename;
+	return exepath;
+}
+
+static uint64_t millis(void) {
+	static LARGE_INTEGER s_frequency;
+	static BOOL s_use_qpc = QueryPerformanceFrequency(&s_frequency);
+	if (s_use_qpc) {
+		LARGE_INTEGER now;
+		QueryPerformanceCounter(&now);
+		return (1000LL * now.QuadPart) / s_frequency.QuadPart;
+	} else {
+		return GetTickCount();
+	}
+}
+
+#endif
+
 
 #if JADI_PLATFORM == JADI_OSX
 static std::string get_exe_path() {
@@ -185,7 +227,6 @@ static std::string to_data_path(const std::string filename) {
   return exepath;
 }
 
-
 static uint64_t millis(void) {
   mach_timebase_info_data_t info;
   if (mach_timebase_info(&info) != KERN_SUCCESS) {
@@ -193,8 +234,6 @@ static uint64_t millis(void) {
   }
   return (mach_absolute_time() * info.numer / info.denom) / 1000000;
 }
-
-
 
 #endif
 
