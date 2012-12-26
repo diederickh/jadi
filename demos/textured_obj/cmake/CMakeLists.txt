@@ -45,6 +45,7 @@ if(JADI_PLATFORM_MAC)
   set(jadi_libs 
     ${jadi_lib_dir}mac/libGLEW.a
     ${jadi_lib_dir}mac/libglfw3.a
+    ${jadi_lib_dir}mac/libjpeg.a
     )
 endif(JADI_PLATFORM_MAC)
 
