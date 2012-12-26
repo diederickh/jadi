@@ -310,23 +310,30 @@ inline void Mat4::lookAt(const Vec3& eye, const Vec3& center, const Vec3& up) {
   
   u = cross(r, f); // ensure orthogonal
   
-  memset(m, 1, 16 * sizeof(float));
-  
   m[0] = r.x;
-  m[4] = r.y;
-  m[8] = r.z;
+  m[1] = r.y;
+  m[2] = r.z;
+  m[3] = 1.0f;
   
-  m[1] = u.x;
+  m[4] = u.x;
   m[5] = u.y;
-  m[9] = u.z;
-
-  m[2] = -f.x;
-  m[6] = -f.y;
-  m[10] = -f.z;
+  m[6] = u.z;
+  m[7] = 1.0f;
   
-  m[3] = -dot(r, eye);
-  m[7] = -dot(u, eye);
-  m[11] = dot(f, eye);
+  m[8] = -f.x;
+  m[9] = -f.y;
+  m[10] = -f.z;
+  m[11] = 1.0f;
+  
+//  printf( "%f, %f, %f\n", r.x, r.y, r.z);
+//  printf( "%f, %f, %f\n", u.x, u.y, u.z);
+//  printf( "%f, %f, %f\n\n\n", f.x, f.y, f.z);
+  
+  m[12] = -dot(r, eye);
+  m[13] = -dot(u, eye);
+  m[14] = dot(f, eye);
+
+  m[15] = 1.0f;
 }
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
