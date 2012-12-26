@@ -11,6 +11,7 @@
 #include <float.h>
 #include <jadi/Jadi.h>
 #include <jadi/OBJ.h>
+#include <jadi/Image.h>
 
 #if JADI_PLATFORM == JADI_WIN
 #include <Windows.h>
@@ -257,12 +258,6 @@ static std::string get_exe_path() {
   return ret;
 }
 
-static std::string to_data_path(const std::string filename) {
-  std::string exepath = get_exe_path();
-  exepath += "data/" +filename;
-  return exepath;
-}
-
 static uint64_t millis(void) {
   mach_timebase_info_data_t info;
   if (mach_timebase_info(&info) != KERN_SUCCESS) {
@@ -281,13 +276,13 @@ static std::string to_data_path(const std::string filename) {
 }
 
 // Simple wrapper which loads an object file from the data path, returns number of vertices
-static size_t load_obj_file(const std::string& filename, float** result, bool useNormals) {
+static size_t load_obj_file(const std::string& filename, float** result, bool useNormals, bool useTexCoords=false) {
   OBJ obj;
   if(!obj.load(to_data_path(filename))) {
     *result = NULL;
     return 0;
   }
-  return obj.getVertices(result, useNormals);
+  return obj.getVertices(result, useNormals, useTexCoords);
 }
 
 static float random(float max) {
