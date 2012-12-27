@@ -14,6 +14,16 @@
 
 #if JADI_PLATFORM == JADI_WIN
 #include <Windows.h>
+/*
+// From libshout 2.3.1
+#ifdef _MSC_VER
+typedef __int64 int64_t;
+typedef unsigned __int64 uint64_t;
+typedef unsigned __int32 uint32_t;
+typedef __int32 int32_t;
+typedef int  ssize_t;
+#endif
+ */
 #endif
 
 #if JADI_PLATFORM == JADI_OSX
@@ -255,12 +265,6 @@ static std::string get_exe_path() {
   std::string ret(dn, usize) ;
   ret.push_back('/');
   return ret;
-}
-
-static std::string to_data_path(const std::string filename) {
-  std::string exepath = get_exe_path();
-  exepath += "data/" +filename;
-  return exepath;
 }
 
 static uint64_t millis(void) {
