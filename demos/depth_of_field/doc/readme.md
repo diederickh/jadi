@@ -7,8 +7,9 @@ fragment to the camera. There is a certain area where we do not blur at all
 (focus distance). 
 
 We perform the following steps:
-1) render complete scene, store diffuse in a texture and save depth map as linear image
-2) apply vertical blur based on the distance following the circle of confusion blur radius (see link)
-3) apply horizontal blur based on the distance ... ""
+
+- render complete scene, store diffuse in a texture and save depth map as linear image
+- apply vertical blur based on the distance following the circle of confusion blur radius (see link)
+- apply horizontal blur based on the distance ... ""
 
 <img src="http://upload.roxlu.com/server/php/files/dof.png">
