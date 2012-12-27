@@ -5,7 +5,7 @@ Particles::Particles() {
   lower_threshold = 0.5;
   higher_threshold = 0.8;
   repel_strength = 0.001;
-  align_strength = 0.001;
+  align_strength = 0.04;
   attract_strength = 0.001;
   radius = 45.0f;
   min_speed = 0.1f;
@@ -77,8 +77,8 @@ void Particles::integrate() {
         dir.normalize();                                                                                                                                                                                    
         F = p * attract_strength;                                                                                                                                                                        
         dir *= F;                                                                                                                                                                                           
-        a.forces -= dir;                                                                                                                                                                                    
-        b.forces += dir;  
+        a.forces += dir;                                                                                                                                                                                    
+        b.forces -= dir;  
       }
     }
   }

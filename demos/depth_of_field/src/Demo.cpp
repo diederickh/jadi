@@ -10,9 +10,9 @@ void Demo::setup() {
   dof.setup(1024, 768);
   cam.setupArcball(1024, 768);
   cam.setPerspective(60.0f, 4.0f/3.0f, 0.1, 150.0f);
-  cam.setPosition(0,0,100);
+  cam.setPosition(0,0,80);
 
-  float s = 55.0f;
+  float s = 45.0f;
   ps.particles.insert(ps.particles.begin(), 250, Particle());
   for(std::vector<Particle>::iterator it = ps.particles.begin(); it != ps.particles.end(); ++it) {
     Particle& p = *it;
@@ -23,7 +23,7 @@ void Demo::setup() {
 }
 
 void Demo::update() {
-  //ps.update();
+  ps.update();
   dof.update();
 }
 

@@ -80,8 +80,6 @@ static const char* DOF_DOF_FS = GLSL(120,
   float get_blur_diameter(float d) {
     float far = 150.0;
     float near = 0.1;
-
-    //    float focus_distance = 26.5; // + sin(u_time) * 5.0; //27.5; 26.5 + sin(u_time) * 1.0;
     float dd = d * (far - near);
     float xd = abs(dd - u_focus_distance);
     float xxd = (dd < u_focus_distance) ? u_focus_distance - xd : u_focus_distance + xd;
