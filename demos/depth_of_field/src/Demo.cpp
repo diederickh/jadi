@@ -41,7 +41,11 @@ void Demo::draw() {
     dof.applyDOF();
   }
   
-   dof.debugDraw();
+  dof.debugDraw();
+  /*
+  draw_string("Testing some string", 100.0, 100.0, 1.0, 0.0, 0.0);
+  draw_string("Testing some string", 100.0, 120.0, 0.0, 1.0, 0.0);
+  */
 }
 
 void Demo::onMouseDown(int x, int y, int button) {
