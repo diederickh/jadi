@@ -13,6 +13,7 @@ set(demo_inc_dir ${demo_base_dir}src/)
 set(demo_install_dir ${demo_base_dir}bin/)
 
 file(GLOB_RECURSE jadi_cpp_files ${jadi_src_dir}*.cpp)
+file(GLOB_RECURSE jadi_c_files ${jadi_inc_dir}*.c)
 file(GLOB_RECURSE demo_cpp_files ${demo_src_dir}*.cpp)
 
 if(APPLE) 
@@ -38,6 +39,7 @@ set(jadi_include_dirs
 
 set(jadi_source_files
   ${jadi_cpp_files}
+  ${jadi_c_files}
   ${demo_cpp_files}
 )
 
@@ -45,7 +47,6 @@ if(JADI_PLATFORM_MAC)
   set(jadi_libs 
     ${jadi_lib_dir}mac/libGLEW.a
     ${jadi_lib_dir}mac/libglfw3.a
-    ${jadi_lib_dir}mac/libjpeg.a
     )
 endif(JADI_PLATFORM_MAC)
 
@@ -92,3 +93,21 @@ endif(JADI_PLATFORM_WIN)
 add_executable(${demo_name} ${jadi_source_files})
 install(TARGETS ${demo_name} DESTINATION ${demo_install_dir})
 target_link_libraries(${demo_name} ${jadi_libs})
+set_target_properties(${demo_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${demo_install_dir})
+
+if(XCODE)
+  add_custom_command(
+    TARGET ${demo_name}
+    POST_BUILD  
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${demo_xcode_build_dir}Debug/data
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${demo_install_dir}data ${demo_install_dir}Debug/data
+  )
+
+#  add_custom_command(
+#    TARGET ${demo_name}
+#    POST_BUILD  
+#    COMMAND ${CMAKE_COMMAND} -E make_directory ${demo_xcode_build_dir}Release/data
+#    COMMAND ${CMAKE_COMMAND} -E copy_directory ${demo_install_dir}data ${demo_install_dir}Release/data
+#  )
+
+endif(XCODE)

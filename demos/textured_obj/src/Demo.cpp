@@ -102,7 +102,7 @@ void Demo::setupBuffers() {
 
 void Demo::setupImages() {
   Image img;
-  img.loadJPEG(to_data_path("statue_diffuse.jpg"));
+  img.load(to_data_path("statue_diffuse.jpg"));
   
   glGenTextures(1, &texture_id);
   glBindTexture(GL_TEXTURE_2D, texture_id);
