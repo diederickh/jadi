@@ -24,6 +24,14 @@ bool OBJ::load(const std::string& filepath) {
         ss >> p.x >> p.y >> p.z;
         normals.push_back(p);
       }
+      else if (line[1] == 't') {
+        TEXCOORD t;
+        ss >> c;
+        ss >> t.s >> t.t;
+//        t.s = 1.0f - t.s;
+        t.t = 1.0f - t.t;
+        tex_coords.push_back(t);
+      }
     }
     else if(c == 'f') {
       std::string part;
@@ -60,9 +68,15 @@ bool OBJ::load(const std::string& filepath) {
   return true;
 }
 
+#define OBJ_VERTEX_NORMAL_TEXCOORD(tri) {                                      \
+    memcpy(ptr+dx, (char*)&vertices[tri.v].x, sizeof(XYZ));         dx += 3;   \
+    memcpy(ptr+dx, (char*)&normals[tri.n].x, sizeof(XYZ));          dx += 3;   \
+    memcpy(ptr+dx, (char*)&tex_coords[tri.t].s, sizeof(TEXCOORD));  dx += 2;   \
+  }
+
 #define OBJ_VERTEX_NORMAL(tri) {                                        \
     memcpy(ptr+dx, (char*)&vertices[tri.v].x, sizeof(XYZ));  dx += 3;   \
-    memcpy(ptr+dx, (char*)&normals[tri.n].x, sizeof(XYZ));  dx += 3;    \
+    memcpy(ptr+dx, (char*)&normals[tri.n].x, sizeof(XYZ));   dx += 3;   \
   }
 
 #define OBJ_VERTEX(tri) {                                               \
@@ -70,22 +84,38 @@ bool OBJ::load(const std::string& filepath) {
   }
 
 // returns number of vertices
-size_t OBJ::getVertices(float** result, bool useNormals) {
+size_t OBJ::getVertices(float** result, bool useNormals, bool useTexCoords) {
   int num_xyz = 1; // only vertices;
-  if(useNormals) {  // also normals
-    num_xyz++;
+  int num_uv = 0;
+  
+  if(useTexCoords) {
+    ++num_uv;
   }
-  size_t num_floats_per_vertex = num_xyz * 3;
+  
+  if(useNormals) {  // also normals
+    ++num_xyz;
+  }
+  
+  size_t num_floats_per_vertex = num_xyz * 3 + num_uv * 2;
   size_t num_vertices = faces.size() * 3;
   size_t num_floats = num_vertices * num_floats_per_vertex;
   float* ptr = new float[num_floats];
   size_t dx = 0;
+
   OBJ::TRI tri;
   OBJ::XYZ vertex;
   OBJ::XYZ normal;
+  OBJ::TEXCOORD tex_coord;
+  
   for(std::vector<FACE>::iterator it = faces.begin(); it != faces.end(); ++it) {
     FACE& f = *it;
-    if(useNormals) {
+    
+    if(useTexCoords && useNormals) {
+      OBJ_VERTEX_NORMAL_TEXCOORD(f.a);
+      OBJ_VERTEX_NORMAL_TEXCOORD(f.b);
+      OBJ_VERTEX_NORMAL_TEXCOORD(f.c);
+    }
+    else if(useNormals) {
       OBJ_VERTEX_NORMAL(f.a);
       OBJ_VERTEX_NORMAL(f.b);
       OBJ_VERTEX_NORMAL(f.c);

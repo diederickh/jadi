@@ -110,7 +110,7 @@ struct Mat4 {
   void orthoBottomLeft(const float w, const float h, const float n, const float f);
   void frustum(const float l, const float r, const float b, const float t, const float n, const float f);
   void perspective(const float fov, const float aspect, const float n, const float f);
-  
+  void lookAt(const Vec3& eye, const Vec3& center, const Vec3& up);
   void setPosition(const float x, const float y, const float z);
   void setScale(const float s);
   void setScale(const float x, const float y, const float z);
@@ -302,10 +302,44 @@ inline void Mat4::orthoTopLeft(const float w, const float h, const float n, cons
 inline void Mat4::orthoBottomLeft(const float w, const float h, const float n, const float f) {
   ortho(0.0f, w, 0.0, h, n, f);
 }
+
+inline void Mat4::lookAt(const Vec3& eye, const Vec3& center, const Vec3& up) {
+  Vec3 f = (center - eye).normalize();
+  Vec3 u = up; u.normalize();
+  Vec3 r = cross(f, u).normalize();
+  
+  u = cross(r, f); // ensure orthogonal
+  
+  m[0] = r.x;
+  m[1] = r.y;
+  m[2] = r.z;
+  m[3] = 1.0f;
+  
+  m[4] = u.x;
+  m[5] = u.y;
+  m[6] = u.z;
+  m[7] = 1.0f;
+  
+  m[8] = -f.x;
+  m[9] = -f.y;
+  m[10] = -f.z;
+  m[11] = 1.0f;
+  
+//  printf( "%f, %f, %f\n", r.x, r.y, r.z);
+//  printf( "%f, %f, %f\n", u.x, u.y, u.z);
+//  printf( "%f, %f, %f\n\n\n", f.x, f.y, f.z);
+  
+  m[12] = -dot(r, eye);
+  m[13] = -dot(u, eye);
+  m[14] = dot(f, eye);
+
+  m[15] = 1.0f;
+}
+
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Mat3, column major
-// 0  3  6 
-// 1  4  7 
+// 0  3  6
+// 1  4  7
 // 2  5  8
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 struct Mat3 {

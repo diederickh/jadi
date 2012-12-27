@@ -18,15 +18,17 @@ class OBJ {
   struct TRI { int v, t, n; };
   struct FACE { TRI a, b, c; };
   struct XYZ {  float x, y, z; };
+  struct TEXCOORD { float s, t; };
 
   bool load(const std::string& filepath);
     
   // we allocate memory for you but the caller is responsible for freeing
-  size_t getVertices(float** result, bool normals = true);
+  size_t getVertices(float** result, bool useNormals = true, bool useTexCoords = false );
 
  public:
   std::vector<OBJ::XYZ> vertices;
   std::vector<OBJ::XYZ> normals;
+  std::vector<OBJ::TEXCOORD> tex_coords;
   std::vector<OBJ::FACE> faces;
   std::vector<int> indices;
 };
