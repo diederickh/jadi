@@ -11,4 +11,4 @@ We perform the following steps:
 2) apply vertical blur based on the distance following the circle of confusion blur radius (see link)
 3) apply horizontal blur based on the distance ... ""
 
-<img src="https://github.com/roxlu/jadi/blob/master/demos/depth_of_field/doc/dof.png">
+<img src="http://upload.roxlu.com/server/php/files/dof.png">
