@@ -66,7 +66,11 @@ static const char* DOF_DOF_FS = GLSL(120,
   uniform sampler2D u_scene_tex;
   uniform float u_time;
   uniform int u_mode;
+  uniform float u_fstop;
+  uniform float u_focus_distance;
+  uniform float u_focal_length;
   varying vec2 v_tex;
+  
   
   float unpack(vec4 col) {
     const vec4 bits = vec4(1.0, 1.0/255.0, 1.0/(255.0 * 255.0), 1.0 / (255.0 * 255.0 * 255.0));
@@ -74,18 +78,15 @@ static const char* DOF_DOF_FS = GLSL(120,
   }
 
   float get_blur_diameter(float d) {
-    float far = 350.0;
+    float far = 150.0;
     float near = 0.1;
-
-    float focus_distance = 26.5 + sin(u_time) * 5.0; //27.5; 26.5 + sin(u_time) * 1.0;
     float dd = d * (far - near);
-    float xd = abs(dd - focus_distance);
-    float xxd = (dd < focus_distance) ? focus_distance - xd : focus_distance + xd;
+    float xd = abs(dd - u_focus_distance);
+    float xxd = (dd < u_focus_distance) ? u_focus_distance - xd : u_focus_distance + xd;
     
-    float f = 12.0;
-    float N = 4.8; 
-    float ms = f / ( focus_distance - f);
-    float blur_c = (f * ms) / N; // blur coefficient
+    float f = u_focal_length;
+    float ms = f / ( u_focus_distance - f);
+    float blur_c = (f * ms) / u_fstop; // blur coefficient
     float b = blur_c * (xd  /xxd);
 
     return b * 13.0;
@@ -95,7 +96,7 @@ static const char* DOF_DOF_FS = GLSL(120,
     vec4 col = texture2D(u_scene_tex, v_tex);
     vec4 depth = texture2D(u_depth_tex, v_tex);
     float z = unpack(depth);
-    float blur_amount = min(get_blur_diameter(z), 30.0);
+    float blur_amount = min(get_blur_diameter(z), 25.0);
     float count = 0.0;
     vec2 tex_offset = vec2(0.0, 1.0/768.0);
     if(u_mode == 1) {
@@ -104,7 +105,7 @@ static const char* DOF_DOF_FS = GLSL(120,
     vec4 blur_col = vec4(0.0);
     if(blur_amount >= 1.0) {
       float hb = blur_amount * 0.5;
-      for(float i = 0.0; i < 30.0; ++i) {
+      for(float i = 0.0; i < 25.0; ++i) {
         if(i >= blur_amount) {
           break;
         }
@@ -183,6 +184,11 @@ class DepthOfField {
   GLuint createTexture(int w, int h, GLenum iformat, GLenum eformat);
   void drawTexture(GLuint prog, GLuint tex, int x, int y, int w, int h);
  public:
+  
+  // uniforms
+  float fstop;
+  float focus_distance;
+  float focal_length;
 
   int fbo_w;
   int fbo_h;
@@ -204,7 +210,6 @@ class DepthOfField {
   GLuint scene_tex;
   GLuint blur0_tex;
   GLuint blur1_tex;
-
 
   // debug drawing.
   GLuint image_prog;

@@ -1,6 +1,10 @@
 #include "DepthOfField.h"
 
-DepthOfField::DepthOfField() {
+DepthOfField::DepthOfField() 
+  :fstop(13.5f)
+  ,focus_distance(13.5)
+  ,focal_length(8.5f)
+{
 }
 
 DepthOfField::~DepthOfField() {
@@ -66,10 +70,14 @@ void DepthOfField::applyDOF() {
   glBindVertexArray(image_vao); 
   glViewport(0, 0, fbo_w, fbo_h);
 
+  glUniform1f(glGetUniformLocation(dof_prog, "u_fstop"), fstop);
+  glUniform1f(glGetUniformLocation(dof_prog, "u_focus_distance"), focus_distance);
+  glUniform1f(glGetUniformLocation(dof_prog, "u_focal_length"), focal_length);
+
   // first blur pass
   // ----------------
   glDrawBuffer(GL_COLOR_ATTACHMENT1); // blur0_tex
-  //glClear(GL_COLOR_BUFFER_BIT); // not necessary (?)
+  glClear(GL_COLOR_BUFFER_BIT); // not necessary (?)
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, scene_tex);
   glUniform1i(glGetUniformLocation(dof_prog, "u_scene_tex"), 0);
@@ -86,6 +94,7 @@ void DepthOfField::applyDOF() {
   // second blur pass
   // ----------------
   glDrawBuffer(GL_COLOR_ATTACHMENT3);
+  glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, blur0_tex);
   glUniform1i(glGetUniformLocation(dof_prog, "u_scene_tex"), 0);
   glUniform1i(glGetUniformLocation(dof_prog, "u_mode"), 1);

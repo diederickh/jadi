@@ -16,6 +16,7 @@ struct Particles {
   void update();
   void integrate();
   std::vector<Particle> particles;
+  std::vector<Particle> predators;
   
   float zone_radius;
   float attract_strength;
