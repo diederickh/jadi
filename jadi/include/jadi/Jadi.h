@@ -19,21 +19,10 @@
 #include <stdlib.h>
 #include <iostream>
 
-#include <opengl/glew.h>
-#include <opengl/glfw3.h>
-
+#include <jadi/GL.h>
 #include <jadi/Math.h>
 #include <jadi/OBJ.h>
 #include <jadi/Camera.h>
-
-#if JADI_PLATFORM == JADI_OSX
-#include <openGL/GL.h> 
-#include <openGL/glext.h>
-
-#undef glGenVertexArrays
-#undef glBindVertexArray
-#define glGenVertexArrays glGenVertexArraysAPPLE
-#define glBindVertexArray glBindVertexArrayAPPLE
-#endif
+#include <jadi/Font.h>
 
 #endif

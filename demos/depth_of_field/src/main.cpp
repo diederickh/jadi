@@ -3,6 +3,7 @@
 #include <iostream>
 #include "Demo.h"
 
+Font jadi_font;
 Demo* demo_ptr;
 bool  is_running;
 
@@ -20,6 +21,7 @@ void char_callback(GLFWwindow window, int chr);
 // APPLICATION ENTRY
 // -----------------
 int main() {
+
   int width = 1024;
   int height = 768;
   demo_ptr = NULL;
@@ -67,8 +69,11 @@ int main() {
 	  fprintf(stderr, "GLEW Error: %s\n", glewGetErrorString(err));
 	  exit(EXIT_FAILURE);
   }
+  
+  // Global helpers
+  jadi_font.init(); // <jadi/Font.h>
 
-
+  // Demo 
   Demo demo;
   demo.mouse_x = demo.mouse_y = demo.prev_mouse_x = demo.prev_mouse_y = 0;
   demo.pressed_mouse_button = 0;
