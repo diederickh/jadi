@@ -32,7 +32,7 @@ int main() {
     exit(EXIT_FAILURE);
   }
 
-  glfwWindowHint(GLFW_DEPTH_BITS, 16);
+  glfwWindowHint(GLFW_DEPTH_BITS, 32);
   glfwWindowHint(GLFW_FSAA_SAMPLES, 4);
 
   //#if JADI_PLATFORM != JADI_OSX
@@ -42,7 +42,7 @@ int main() {
   //glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
   //#endif
 
-  GLFWwindow window = glfwCreateWindow(width, height, GLFW_WINDOWED, "Simulation", NULL);
+  GLFWwindow window = glfwCreateWindow(width, height, GLFW_WINDOWED, "Demo", NULL);
   if(!window) {
     printf("ERROR: cannot open window.\n");
     exit(EXIT_FAILURE);

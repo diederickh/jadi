@@ -42,7 +42,7 @@ void Particles::integrate() {
     ls = dir.lengthSquared();
     if(ls > radius_sq) {
       dir.normalize();
-      dir *= (ls - radius_sq) * 0.0025f;
+      dir *= (ls - radius_sq) * 0.000025f;
       a.forces += dir;
     }
 

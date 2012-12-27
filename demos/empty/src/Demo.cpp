@@ -9,11 +9,11 @@ Demo::~Demo() {
 void Demo::setup() {
   dof.setup(1024, 768);
   cam.setupArcball(1024, 768);
-  cam.setPerspective(60.0f, 4.0f/3.0f, 0.1,350.0f);
-  cam.setPosition(0,0,50);
+  cam.setPerspective(60.0f, 4.0f/3.0f, 0.1, 150.0f);
+  cam.setPosition(0,0,30);
 
-  float s = 80.0f;
-  ps.particles.insert(ps.particles.begin(), 50, Particle());
+  float s = 15.0f;
+  ps.particles.insert(ps.particles.begin(), 150, Particle());
   for(std::vector<Particle>::iterator it = ps.particles.begin(); it != ps.particles.end(); ++it) {
     Particle& p = *it;
     p.velocity.set(random(-s,s),random(-s,s),random(-s,s));
@@ -23,7 +23,7 @@ void Demo::setup() {
 }
 
 void Demo::update() {
-  ps.update();
+  //ps.update();
   dof.update();
 }
 
@@ -31,16 +31,17 @@ void Demo::draw() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   const float* pm = cam.pm().getPtr();
   const float* vm = cam.vm().getPtr();
-
   {
     dof.beginScenePass();
     dof.draw(pm, vm, NULL, ps.particles);
     dof.endScenePass();
   }
+
   {
     dof.applyDOF();
   }
-  dof.debugDraw();
+  
+   dof.debugDraw();
 }
 
 void Demo::onMouseDown(int x, int y, int button) {
