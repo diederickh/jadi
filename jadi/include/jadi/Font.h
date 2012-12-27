@@ -333,11 +333,11 @@ static void draw_string(const std::string& str, float x, float y, float r = 1.0,
   size_t to_allocate = str.size() * sizeof(float) * 4 * 6; // 4-floats per vertex, 6 floats (two tris) per char
   if(to_allocate > jadi_font.allocated) {
     while(jadi_font.allocated < to_allocate) {
-      jadi_font.allocated = std::max<size_t>(jadi_font.allocated * 2, 256);
+      jadi_font.allocated = std::max<size_t>(jadi_font.allocated * 2, 4096);
     }
+    glBindVertexArray(jadi_font.vao);
     glBindBuffer(GL_ARRAY_BUFFER, jadi_font.vbo);
     glBufferData(GL_ARRAY_BUFFER, jadi_font.allocated, NULL, GL_DYNAMIC_DRAW);
-
 
     delete[] jadi_font.buffer; 
     jadi_font.buffer = new float[jadi_font.allocated];
@@ -348,10 +348,15 @@ static void draw_string(const std::string& str, float x, float y, float r = 1.0,
   size_t dx = 0;
   const char* ptr = str.c_str();
   for(int i = 0; i < str.size(); ++i) {
-    int c = *ptr++;
+    int c = str[i];
     int dd = c - STB_SOMEFONT_FIRST_CHAR;
 
     stb_fontchar* cd = &jadi_font.fontdata[c - STB_SOMEFONT_FIRST_CHAR];
+    if(str[i] == ' ') {
+      x += 5;
+      continue;
+    }
+
     jadi_font.buffer[dx++] = x + cd->x0f;
     jadi_font.buffer[dx++] = y + cd->y1f;
     jadi_font.buffer[dx++] = cd->s0f;
@@ -385,10 +390,16 @@ static void draw_string(const std::string& str, float x, float y, float r = 1.0,
     x += cd->x1f;
   }
 
-  glBindBuffer(GL_ARRAY_BUFFER, jadi_font.vbo);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, dx * sizeof(float), jadi_font.buffer);
   glUseProgram(jadi_font.prog);
   glBindVertexArray(jadi_font.vao);
+
+  // @todo WHY DOES glBufferSubData NOT WORK???? (ATI CARD?)
+  glBindBuffer(GL_ARRAY_BUFFER, jadi_font.vbo);
+  glBufferData(GL_ARRAY_BUFFER, dx * sizeof(float), jadi_font.buffer, GL_DYNAMIC_DRAW);
+  glEnableVertexAttribArray(glGetAttribLocation(jadi_font.prog, "a_pos"));
+  glEnableVertexAttribArray(glGetAttribLocation(jadi_font.prog, "a_tex"));
+  glVertexAttribPointer(glGetAttribLocation(jadi_font.prog, "a_pos"), 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (GLvoid*)0);
+  glVertexAttribPointer(glGetAttribLocation(jadi_font.prog, "a_tex"), 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (GLvoid*)8);
   
   float col[3] = {r,g,b};
   glUniform3fv(jadi_font.u_col, 1, col);

@@ -7,7 +7,7 @@ Particles::Particles() {
   repel_strength = 0.001;
   align_strength = 0.001;
   attract_strength = 0.001;
-  radius = 20.0f;
+  radius = 45.0f;
   min_speed = 0.1f;
   max_speed = 0.5f;
   last_time = 0;
@@ -42,7 +42,7 @@ void Particles::integrate() {
     ls = dir.lengthSquared();
     if(ls > radius_sq) {
       dir.normalize();
-      dir *= (ls - radius_sq) * 0.000025f;
+      dir *= (ls - radius_sq) * 0.00025f;
       a.forces += dir;
     }
 
