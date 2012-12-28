@@ -1,9 +1,9 @@
 #include "DepthOfField.h"
 
 DepthOfField::DepthOfField() 
-  :fstop(13.5f)
-  ,focus_distance(13.5)
-  ,focal_length(8.5f)
+  :fstop(3.5f)
+  ,focus_distance(16.5)
+  ,focal_length(9.6f)
 {
 }
 
@@ -44,7 +44,7 @@ void DepthOfField::debugDraw() {
   drawTexture(image_prog, scene_tex, 0,384,512,384);
   drawTexture(depth_prog, depth_tex, 0,0,512,384);
   drawTexture(image_prog, linear_depth_tex, 512, 0, 512, 384);
-  drawTexture(image_prog, blur1_tex, 512, 384, 512, 384);
+  drawTexture(image_prog, blur0_tex, 512, 384, 512, 384);
 }
 
 
@@ -93,11 +93,29 @@ void DepthOfField::applyDOF() {
 
   // second blur pass
   // ----------------
-  glDrawBuffer(GL_COLOR_ATTACHMENT3);
+  glDrawBuffer(GL_COLOR_ATTACHMENT1); // blur1_tex
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, blur0_tex);
   glUniform1i(glGetUniformLocation(dof_prog, "u_scene_tex"), 0);
   glUniform1i(glGetUniformLocation(dof_prog, "u_mode"), 1);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
+
+  // Interpolate blur with scene texture
+  // ------------------------------------------------
+  glUseProgram(final_prog);
+  GLint uscene_tex = glGetUniformLocation(final_prog, "u_scene_tex");
+  GLint ublur_tex = glGetUniformLocation(final_prog, "u_blurred_tex");
+  GLint udepth_tex = glGetUniformLocation(final_prog, "u_depth_tex");
+
+  glDrawBuffer(GL_COLOR_ATTACHMENT1);  // blur0_tex
+  glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, scene_tex); glUniform1i(uscene_tex, 0);
+  glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D, blur0_tex); glUniform1i(ublur_tex, 1);
+  glActiveTexture(GL_TEXTURE2); glBindTexture(GL_TEXTURE_2D, linear_depth_tex); glUniform1i(udepth_tex, 2);
+
+  glUniform1f(glGetUniformLocation(final_prog, "u_fstop"), fstop);
+  glUniform1f(glGetUniformLocation(final_prog, "u_focus_distance"), focus_distance);
+  glUniform1f(glGetUniformLocation(final_prog, "u_focal_length"), focal_length);
+
   glDrawArrays(GL_TRIANGLES, 0, 6);
 
   glDepthMask(GL_TRUE);
@@ -213,6 +231,7 @@ void DepthOfField::setupShaders() {
   image_prog = createProgram(DOF_IMAGE_VS, DOF_IMAGE_FS); // debug: draw an image quad, just draw a texture
   scene_prog = createProgram(DOF_SCENE_VS, DOF_SCENE_FS); // dof step 0: renders the scene + writes linear depth 
   dof_prog = createProgram(DOF_DOF_VS, DOF_DOF_FS); // dof: applies box blur using 2 render passes
+  final_prog = createProgram(DOF_DOF_VS, DOF_FINAL_FS); 
 }
 
 GLuint DepthOfField::createProgram(const char* vs, const char* fs) {
