@@ -28,10 +28,8 @@ inline Image::Image()
 {}
 
 inline bool Image::load(const std::string& filepath) {
-
     pixels = stbi_load(filepath.c_str(), &width, &height, &numChannels, 0);
-    printf("%d, %d, %d\n", width, height, numChannels);
-    
+  
     if (pixels==NULL) {
         fprintf(stderr, "Image::load(): image data is NULL");
         return false;

@@ -3,7 +3,6 @@
 
 #include <jadi/Jadi.h>
 #include <vector>
-#include "Particles.h"
 
 // CAPTURE DIFFUSE, RENDER DEPTH INTO DEPTH ATTACHMENT
 // -----------------------------------------------------------
@@ -18,7 +17,7 @@ static const char* SSAO_SCENE_VS = GLSL(120,
 
   void main() {
     v_pos = u_vm * u_mm * a_pos;
-    v_norm = a_norm;
+    v_norm = mat3(u_vm * u_mm) * a_norm;
     gl_Position = u_pm * v_pos;
     
   }
@@ -29,12 +28,12 @@ static const char* SSAO_SCENE_FS = GLSL(120,
   varying vec4 v_pos;
   
   void main() {
-    float far = 350.0;
+    float far = 150.0;
     float near = 0.1;
     float linear_depth = length(v_pos) / (far - near);
 
     gl_FragData[0] = vec4(v_pos);
-    gl_FragData[1] = vec4(0.5 + 0.5 * v_norm, linear_depth);
+    gl_FragData[1] = vec4(normalize(v_norm), linear_depth);
   }
 );
 
@@ -60,21 +59,18 @@ static const char* SSAO_VS = GLSL(120,
 static const char* SSAO_FS = GLSL(120,
   uniform sampler2D u_normalAndDepthTex;  // view space normal and linear depth
   uniform sampler2D u_viewSpacePositionTex;  // view space normal and linear depth
-//  uniform sampler2D u_randomJitterTex;  // Normalmap to randomize the sampling kernel
-  uniform vec2 u_texelSize;
+  uniform sampler2D u_randomJitterTex;  // Normalmap to randomize the sampling kernel
+  uniform float u_texelWidth;
+  uniform float u_texelHeight;
 
   uniform float u_occluderBias;
   uniform float u_samplingRadius;
-  uniform vec2 u_attenuation; // .x constant, .y linear, .z quadratic
+  uniform vec2 u_attenuation; // .x constant, .y linear, .z quadratic (unused)
 
   varying vec2 v_texCoord;
   varying vec4 v_pos;
                                   
   /// Sample the ambient occlusion at the following UV coordinate.
-  /// <param name="srcPosition">3D position of the source pixel being tested.</param>
-  /// <param name="srcNormal">Normal of the source pixel being tested.</param>
-  /// <param name="uv">UV coordinate to sample/test for ambient occlusion.</param>
-  /// <returns>Ambient occlusion amount.</returns>
   float SamplePixels(vec3 srcPosition, vec3 srcNormal, vec2 uv)
   {
     // Get the 3D position of the destination pixel
@@ -94,15 +90,11 @@ static const char* SSAO_FS = GLSL(120,
     return intensity * attenuation;
   }
                                   
-  /// <summary>
-  /// Fragment shader entry.
-  /// <summary>
   void main ()
   {
     // Get position and normal vector for this fragment
     vec3 srcNormal = texture2D(u_normalAndDepthTex, v_texCoord).xyz;
-//    vec2 randVec = normalize(texture2D(u_randomJitterTex, v_texCoord).xy * 2.0 - 1.0);
-    vec2 randVec = vec2(0.5, 0.5);
+    vec2 randVec = normalize(texture2D(u_randomJitterTex, v_texCoord).xy * 2.0 - 1.0);
     
     float srcDepth = texture2D(u_normalAndDepthTex, v_texCoord).w;
     vec3 srcPosition = texture2D(u_viewSpacePositionTex, v_texCoord).xyz;
@@ -127,13 +119,19 @@ static const char* SSAO_FS = GLSL(120,
     // Sample from 16 pixels, which should be enough to appromixate a result. You can
     // sample from more pixels, but it comes at the cost of performance.
     float occlusion = 0.0;
+    
     for (int i = 0; i < 4; ++i)
     {
       vec2 k1 = reflect(kernel[i], randVec);
+      
       vec2 k2 = vec2(k1.x * Sin45 - k1.y * Sin45,
                      k1.x * Sin45 + k1.y * Sin45);
-      k1 *= u_texelSize;
-      k2 *= u_texelSize;
+      
+      k1.x *= u_texelWidth;
+      k1.y *= u_texelHeight;
+      
+      k2.x *= u_texelWidth;
+      k2.y *= u_texelHeight;
       
       occlusion += SamplePixels(srcPosition, srcNormal, v_texCoord + k1 * kernelRadius);
       occlusion += SamplePixels(srcPosition, srcNormal, v_texCoord + k2 * kernelRadius * 0.75);
@@ -142,10 +140,29 @@ static const char* SSAO_FS = GLSL(120,
     }
 
     // Average and clamp ambient occlusion
-    occlusion /= 16.0;
+    occlusion /= 16;
     occlusion = clamp(occlusion, 0.0, 1.0);
 
-    gl_FragColor = vec4(occlusion, occlusion, occlusion, 1.0);
+//    gl_FragColor = vec4(1.0 - occlusion, 1.0 - occlusion, 1.0 - occlusion, 1.0);
+    
+    vec3 ambient = vec3(1.0, 1.0, 1.0);
+//    vec3 diffuse = vec3(1.0, 1.0, 1.0);
+//    
+//    vec3 lightPos = vec3(0.0, 0.0, 0.0);
+//    vec3 lightDir = vec3(-0.5, -0.5, 0.0);
+//    
+//    float NdotL = max(dot(srcNormal, -normalize(lightDir)), 0.0);
+//    diffuse *= NdotL;
+
+    vec3 final_color = ambient;// + diffuse;
+    gl_FragData[0] = vec4(final_color * (1.0-occlusion), 1.0f);
+//
+//    // blend AO
+//    final_color = clamp(final_color - occlusion, 0.0, 1.0);
+//    
+//    // Apply gamma correction
+//    gl_FragColor.rgb = pow(final_color, vec3(1.0 / 2.2));
+//    gl_FragColor.a = 1.0;
   }
 );
 
@@ -198,11 +215,12 @@ class SSAO {
   void endScenePass();
   void applySSAO();
   void debugDraw();
-  void draw(const float* pm, const float* vm, const float* nm, std::vector<Particle>& particles);
+  void draw(const float* pm, const float* vm, const float* nm);
  private:
   void setupShaders();
   void setupBuffers();
   void setupFBO();
+  void loadImages();
   GLuint createProgram(const char* vs, const char* fs);
   GLuint createTexture(int w, int h, GLenum iformat, GLenum eformat);
   void drawTexture(GLuint prog, GLuint tex, int x, int y, int w, int h);
@@ -225,7 +243,9 @@ class SSAO {
   // textures
   GLuint depth_tex;
   GLuint linear_depth_tex;
+  GLuint position_tex;
   GLuint scene_tex;
+  GLuint random_tex;
 
   // debug drawing.
   GLuint image_prog;

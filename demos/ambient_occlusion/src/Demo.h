@@ -3,7 +3,6 @@
 
 #include <jadi/Jadi.h>
 #include "SSAO.h"
-#include "Particles.h"
 
 class Demo {
  public:
@@ -33,7 +32,6 @@ class Demo {
 
   // custom members
   Camera cam;
-  Particles ps;
   SSAO ssao;
 };
 #endif
