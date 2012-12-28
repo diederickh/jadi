@@ -90,9 +90,9 @@ void SSAO::applySSAO() {
   glUniform1f(glGetUniformLocation(ssao_prog, "u_texelWidth"), 1.0f/(float)fbo_w);
   glUniform1f(glGetUniformLocation(ssao_prog, "u_texelHeight"), 1.0f/(float)fbo_h);
   
-  glUniform1f(glGetUniformLocation(ssao_prog, "u_occluderBias"), 0.2f);
-  glUniform1f(glGetUniformLocation(ssao_prog, "u_samplingRadius"), 40.0f);
-  glUniform2f(glGetUniformLocation(ssao_prog, "u_attenuation"), 1.0f, 0.0f);
+  glUniform1f(glGetUniformLocation(ssao_prog, "u_occluderBias"), 0.05f);
+  glUniform1f(glGetUniformLocation(ssao_prog, "u_samplingRadius"), 20.0f);
+  glUniform2f(glGetUniformLocation(ssao_prog, "u_attenuation"), 1.0f, 0.05f);
   
   glDrawArrays(GL_TRIANGLES, 0, 6);
 

@@ -143,26 +143,19 @@ static const char* SSAO_FS = GLSL(120,
     occlusion /= 16;
     occlusion = clamp(occlusion, 0.0, 1.0);
 
-//    gl_FragColor = vec4(1.0 - occlusion, 1.0 - occlusion, 1.0 - occlusion, 1.0);
+    vec3 ambient = vec3(0.3, 0.3, 0.3);
+    vec3 diffuse = vec3(1.0, 1.0, 1.0);
     
-    vec3 ambient = vec3(1.0, 1.0, 1.0);
-//    vec3 diffuse = vec3(1.0, 1.0, 1.0);
-//    
-//    vec3 lightPos = vec3(0.0, 0.0, 0.0);
-//    vec3 lightDir = vec3(-0.5, -0.5, 0.0);
-//    
-//    float NdotL = max(dot(srcNormal, -normalize(lightDir)), 0.0);
-//    diffuse *= NdotL;
+    vec3 lightPos = vec3(0.0, 0.0, 0.0);
+    vec3 lightDir = vec3(-0.5, -0.5, 0.0);
+    
+    float NdotL = max(dot(srcNormal, -normalize(lightDir)), 0.0);
+    diffuse *= NdotL;
 
-    vec3 final_color = ambient;// + diffuse;
-    gl_FragData[0] = vec4(final_color * (1.0-occlusion), 1.0f);
-//
-//    // blend AO
-//    final_color = clamp(final_color - occlusion, 0.0, 1.0);
-//    
-//    // Apply gamma correction
-//    gl_FragColor.rgb = pow(final_color, vec3(1.0 / 2.2));
-//    gl_FragColor.a = 1.0;
+    vec3 final_color = ambient + diffuse;
+    final_color *= (1.0-occlusion);
+    
+    gl_FragData[0] = vec4(final_color , 1.0f);
   }
 );
 
