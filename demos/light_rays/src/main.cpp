@@ -39,9 +39,9 @@ int main() {
 
   //#if JADI_PLATFORM != JADI_OSX
   // doesn't work if we specify 3.2 - errors on line 78 of DepthOfField.cpp (GL_INVALID_ENUM)
-  //glfwWindowHint( GLFW_OPENGL_VERSION_MAJOR, 3 );
-  //glfwWindowHint( GLFW_OPENGL_VERSION_MINOR, 2 );
-  //glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+  glfwWindowHint( GLFW_OPENGL_VERSION_MAJOR, 3 );
+  glfwWindowHint( GLFW_OPENGL_VERSION_MINOR, 2 );
+  glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
   //#endif
 
   GLFWwindow window = glfwCreateWindow(width, height, GLFW_WINDOWED, "Demo", NULL);
