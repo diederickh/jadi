@@ -12,9 +12,19 @@ void Demo::setup() {
   cam.setPerspective(60.0f, 4.0f/3.0f, 0.1, 150.0f);
   cam.setPosition(0,0,80);
 
+
+  // PARTICLES
   float s = 45.0f;
   ps.particles.insert(ps.particles.begin(), 250, Particle());
   for(std::vector<Particle>::iterator it = ps.particles.begin(); it != ps.particles.end(); ++it) {
+    Particle& p = *it;
+    p.velocity.set(random(-s,s),random(-s,s),random(-s,s));
+    p.position.set(random(-s,s),random(-s,s),random(-s,s));
+  }
+
+  // PREDATORS
+  ps.predators.insert(ps.predators.begin(), 10, Particle());
+  for(std::vector<Particle>::iterator it = ps.predators.begin(); it != ps.predators.end(); ++it) {
     Particle& p = *it;
     p.velocity.set(random(-s,s),random(-s,s),random(-s,s));
     p.position.set(random(-s,s),random(-s,s),random(-s,s));
@@ -34,6 +44,7 @@ void Demo::draw() {
   {
     dof.beginScenePass();
     dof.draw(pm, vm, NULL, ps.particles);
+    //dof.draw(pm, vm, NULL, ps.predators);
     dof.endScenePass();
   }
 

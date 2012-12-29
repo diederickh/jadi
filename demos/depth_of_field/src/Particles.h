@@ -26,6 +26,8 @@ struct Particles {
   float higher_threshold;
   float max_speed;
   float min_speed;
+  float max_predator_speed;
+  float min_predator_speed;
   float ls;
   float F;
   float p;

@@ -10,6 +10,7 @@ We perform the following steps:
 
 - render complete scene, store diffuse in a texture and save depth map as linear image
 - apply vertical blur based on the distance following the circle of confusion blur radius (see link)
-- apply horizontal blur based on the distance ... ""
+- apply horizontal blur based on the distance ... "" 
+- the last pass interpolates between the blurred texture and the scene/diffuse texture 
 
 <img src="http://upload.roxlu.com/server/php/files/dof.png">

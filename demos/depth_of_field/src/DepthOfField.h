@@ -150,6 +150,53 @@ static const char* DOF_IMAGE_FS = GLSL(120,
   }
 );
 
+
+static const char* DOF_FINAL_FS = GLSL(120, 
+  uniform int u_mode;
+  uniform float u_fstop;
+  uniform float u_focus_distance;
+  uniform float u_focal_length;
+  uniform sampler2D u_scene_tex;
+  uniform sampler2D u_blurred_tex;
+  uniform sampler2D u_depth_tex;
+  varying vec2 v_tex;
+
+
+  float get_blur_diameter(float d) {
+    float far = 150.0;
+    float near = 0.1;
+    float dd = d * (far - near);
+    float xd = abs(dd - u_focus_distance);
+    float xxd = (dd < u_focus_distance) ? u_focus_distance - xd : u_focus_distance + xd;
+    
+    float f = u_focal_length;
+    float ms = f / ( u_focus_distance - f);
+    float blur_c = (f * ms) / u_fstop; // blur coefficient
+    float b = blur_c * (xd  /xxd);
+
+    return b * 13.0;
+  }
+
+  float unpack(vec4 col) {
+    const vec4 bits = vec4(1.0, 1.0/255.0, 1.0/(255.0 * 255.0), 1.0 / (255.0 * 255.0 * 255.0));
+    return dot(col, bits);
+  }
+
+  void main() {
+    gl_FragColor = texture2D(u_blurred_tex, v_tex);
+    gl_FragColor.a = 1.0;
+    vec4 col = texture2D(u_scene_tex, v_tex);
+    vec4 blur = texture2D(u_blurred_tex, v_tex);
+    float depth = unpack(texture2D(u_depth_tex, v_tex));
+    float blur_amount = get_blur_diameter(depth);
+    float lerp = min(blur_amount / 25.0, 1.0);
+    gl_FragColor = (col * (1.0 - lerp)) + (blur * lerp);
+    gl_FragColor.a = 1.0;
+  }
+
+);
+
+
 // FRAGMENT SHADER TO DRAW DEPTH BUFFER TEXTURE (DEBUG)
 // -----------------------------------------------------------
 static const char* DOF_DEPTH_FS = GLSL(120,
@@ -198,6 +245,7 @@ class DepthOfField {
   GLuint depth_prog; // used to draw depth buffer.
   GLuint scene_prog; // captures the scene
   GLuint dof_prog; // dof
+  GLuint final_prog; // interpolates blur + scene
 
   // Used to draw particles
   GLuint vbo;

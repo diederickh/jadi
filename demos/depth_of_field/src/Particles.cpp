@@ -4,12 +4,14 @@ Particles::Particles() {
   zone_radius = 10;
   lower_threshold = 0.5;
   higher_threshold = 0.8;
-  repel_strength = 0.001;
+  repel_strength = 0.01;
   align_strength = 0.04;
-  attract_strength = 0.001;
-  radius = 45.0f;
-  min_speed = 0.1f;
-  max_speed = 0.5f;
+  attract_strength = 0.01;
+  radius = 35.0f;
+  min_speed = 0.4f;
+  max_speed = 0.8f;
+  min_predator_speed = 1.0f;
+  max_predator_speed = 2.0f;
   last_time = 0;
   time_accum = 0;
   last_time = 0;
@@ -19,8 +21,8 @@ Particles::Particles() {
 void Particles::update() {
   uint64_t now = millis();
   uint64_t diff = (now - last_time);
-  if(diff > 48) {
-    diff = 48;
+  if(diff > 32) {
+    diff = 32;
   }
 
   time_accum += diff;
@@ -36,6 +38,8 @@ void Particles::integrate() {
   float radius_sq = radius * radius;
   float thresh_delta = higher_threshold - lower_threshold;
   float s = 0.05;
+  float pred_radius = 15.0f;
+  float pred_radius_sq = pred_radius * pred_radius;
   for(std::vector<Particle>::iterator ita = particles.begin(); ita != particles.end(); ++ita) {
     Particle& a = *ita;
     dir = -a.position;
@@ -44,6 +48,17 @@ void Particles::integrate() {
       dir.normalize();
       dir *= (ls - radius_sq) * 0.00025f;
       a.forces += dir;
+    }
+
+    for(std::vector<Particle>::iterator pit = predators.begin(); pit != predators.end(); ++pit) {
+      Particle& pred = *pit;
+      dir = pred.position - a.position;
+      ls = dir.lengthSquared();
+      if(ls < pred_radius_sq) {
+        F = (pred_radius_sq / ls) * 3.3f;
+        dir.normalize();
+        a.forces -= dir * F;
+      }
     }
 
     Vec3 r(random(-s,s),random(-s,s),random(-s,s));
@@ -102,5 +117,35 @@ void Particles::integrate() {
     a.position += a.velocity;
     a.velocity *= 0.99;
     a.forces = 0;
+  }
+
+  max_speed_sq = max_predator_speed * max_predator_speed;
+  min_speed_sq = min_predator_speed * min_predator_speed;
+  for(std::vector<Particle>::iterator it = predators.begin(); it != predators.end(); ++it) {
+    Particle& p = *it;
+
+    // move towards center
+    dir = -p.position;
+    ls = dir.lengthSquared();
+    dir.normalize();
+    dir *= 0.03;
+    p.forces += dir;
+
+    p.velocity += p.forces;
+    p.velocity_norm = p.velocity;
+
+    p.velocity_norm.normalize();
+    ls = p.velocity.lengthSquared();
+
+    if(ls > max_speed_sq) {
+      p.velocity = p.velocity_norm * max_predator_speed;
+    }
+    else if(ls < min_speed_sq) {
+      p.velocity = p.velocity_norm * min_predator_speed;
+    }
+
+    p.position += p.velocity;
+    p.velocity *= 0.99;
+    p.forces = 0;
   }
 }
