@@ -21,13 +21,17 @@ void Demo::setup() {
   }
 
   // PREDATORS
-  ps.predators.insert(ps.predators.begin(), 10, Particle());
+  ps.predators.insert(ps.predators.begin(), 30, Particle());
   for(std::vector<Particle>::iterator it = ps.predators.begin(); it != ps.predators.end(); ++it) {
     Particle& p = *it;
     p.velocity.set(random(-s,s),random(-s,s),random(-s,s));
     p.position.set(random(-s,s),random(-s,s),random(-s,s));
   }
   glClearColor(.1f, .1f, .1f, 1.0f);
+
+  // RAYS
+  rays.setup(1024, 768);
+  helper.setup();
 }
 
 void Demo::update() {
@@ -39,9 +43,35 @@ void Demo::draw() {
   const float* pm = cam.pm().getPtr();
   const float* vm = cam.vm().getPtr();
 
-  draw_string("Raw depth buffer", 10, 394, 0, 0, 0);
-  draw_string("Linear depth buffer as rgb", 522, 394, 1, 1, 1);
-  draw_string("Depth of field", 522, 10, 1, 1, 1);
+  // STEP 1: render scene with light and occluding objects
+  {
+    rays.beginOcclusionAndLightPass();
+    helper.drawLights(pm, vm, ps.predators);
+    helper.drawOcclusion(pm, vm, ps.particles);
+    rays.endOcclusionAndLightPass();
+  }
+
+  // STEP 2: create rays
+  {
+    rays.createRays();
+  }
+  
+  // STEP 3: draw rays + shaded scene
+  {
+    rays.beginShadedPass(); // we capture the shaded scene so we can debug draw all stages; this is not really needed
+    helper.drawShadedParticles(pm, vm, ps.particles);
+    rays.endShadedPass();
+  }
+
+  // Draw the result + differnet steps
+  rays.debugDraw();
+
+
+  // some titles
+  draw_string("Rays buffer", 10, 10, 1.0, 1.0, 1.0);
+  draw_string("Occlusion buffer", 10, 394, 1.0, 1.0, 1.0);
+  draw_string("Shaded scene", 522, 394, 1.0, 1.0, 1.0);
+  draw_string("Occlusion buffer + Shaded scene + Rays buffer", 522, 10, 1.0, 1.0, 1.0);
 }
 
 

@@ -46,10 +46,11 @@ void Particles::integrate() {
     ls = dir.lengthSquared();
     if(ls > radius_sq) {
       dir.normalize();
-      dir *= (ls - radius_sq) * 0.00025f;
+      dir *= (ls - radius_sq) * 0.0025f;
       a.forces += dir;
     }
-
+    continue;
+    /*
     for(std::vector<Particle>::iterator pit = predators.begin(); pit != predators.end(); ++pit) {
       Particle& pred = *pit;
       dir = pred.position - a.position;
@@ -60,6 +61,7 @@ void Particles::integrate() {
         a.forces -= dir * F;
       }
     }
+    */
 
     Vec3 r(random(-s,s),random(-s,s),random(-s,s));
     a.forces += r;
@@ -128,7 +130,7 @@ void Particles::integrate() {
     dir = -p.position;
     ls = dir.lengthSquared();
     dir.normalize();
-    dir *= 0.03;
+    dir *= 0.14;
     p.forces += dir;
 
     p.velocity += p.forces;

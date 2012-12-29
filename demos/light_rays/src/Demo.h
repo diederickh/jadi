@@ -3,6 +3,8 @@
 
 #include <jadi/Jadi.h>
 #include "Particles.h"
+#include "LightRays.h" /* applies the light ray shader; captures scene + makes rays */
+#include "LightRayHelper.h" /* used to draw light ray related stuff */
 
 class Demo {
  public:
@@ -33,5 +35,7 @@ class Demo {
   // custom members
   Camera cam;
   Particles ps;
+  LightRays rays;
+  LightRayHelper helper;
 };
 #endif

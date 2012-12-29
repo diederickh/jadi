@@ -1,18 +1,244 @@
 #include "LightRays.h"
 
-LightRays::LightRays() {
+LightRays::LightRays()
+  :image_prog(0)
+  ,rays_prog(0)
+  ,vao(0)
+  ,fbo(0)
+  ,vbo(0)
+  ,tex_rays(0)
+  ,tex_occlusion(0)
+  ,tex_shaded(0)
+  ,depth_rbo(0)
+  ,fbo_w(0)
+  ,fbo_h(0)
+  ,uexposure(-1)
+  ,utex(-1)
+  ,udecay(-1)
+  ,udensity(-1)
+  ,uweight(-1)
+  ,exposure(0.0034f)
+  ,decay(1.0f)
+  ,density(0.84f)
+  ,weight(5.65f)
+{
 }
 
 LightRays::~LightRays() {
 }
 
-void LightRays::setup() {
+void LightRays::debugDraw() {
+  drawTexture(tex_occlusion, 0, 0, 512, 384);
+  drawTexture(tex_rays, 0, 384, 512, 384);
+  drawTexture(tex_shaded, 512, 0, 512, 384);
+
+  // here we merge both
+  glEnable(GL_BLEND);
+  glDepthMask(GL_FALSE);
+  glBlendFunc(GL_ONE, GL_ONE);
+  drawTexture(tex_occlusion, 512, 384, 512, 384);
+  drawTexture(tex_rays, 512, 384, 512, 384);
+  drawTexture(tex_shaded, 512, 384, 512, 384);
+  glDepthMask(GL_TRUE);
+  glDisable(GL_BLEND);
+}
+
+void LightRays::drawTexture(GLuint tex, int x, int y, int w, int h) {
+  // setup framebuffer/viewport/program/vao
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glDrawBuffer(GL_BACK_LEFT);
+  glUseProgram(image_prog);
+  glViewport(x, y, w, h);
+  glBindVertexArray(vao);
+
+  // set texture
+  GLint utex = glGetUniformLocation(image_prog, "u_tex");
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, tex);
+  glUniform1i(utex, 0);
+
+  // and draw!
+  glDrawArrays(GL_TRIANGLES, 0, 6);
+  
+  // reset
+  glViewport(0,0,1024, 768);
+}
+
+void LightRays::setup(int w, int h) {
+  fbo_w = w;
+  fbo_h = h;
   setupShaders();
   setupBuffers();
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_BLEND);
 }
 
 void LightRays::setupShaders() {
+  // Create debug image drawer
+  image_prog = createShader(LR_SHARED_VS, LR_IMAGE_FS); 
+  glBindAttribLocation(image_prog, 0, "a_pos");
+  glBindAttribLocation(image_prog, 1, "a_tex"); 
+  glLinkProgram(image_prog);  
+
+  // Create rays shader
+  rays_prog = createShader(LR_SHARED_VS, LR_RAYS_FS); 
+  glBindAttribLocation(rays_prog, 0, "a_pos");
+  glBindAttribLocation(rays_prog, 1, "a_tex"); 
+  glLinkProgram(rays_prog);  
+
+
+  // Get uniforms
+  glUseProgram(rays_prog);
+  uexposure = glGetUniformLocation(rays_prog, "u_exposure");
+  utex = glGetUniformLocation(rays_prog, "u_tex");
+  udecay = glGetUniformLocation(rays_prog, "u_decay");
+  udensity = glGetUniformLocation(rays_prog, "u_density");
+  uweight = glGetUniformLocation(rays_prog, "u_weight");
+}
+
+GLuint LightRays::createShader(const char* vs, const char* fs) {
+  GLuint vert_id = glCreateShader(GL_VERTEX_SHADER);
+  GLuint frag_id = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(vert_id, 1, &vs, NULL);
+  glShaderSource(frag_id, 1, &fs, NULL);
+  glCompileShader(vert_id); eglGetShaderInfoLog(vert_id);
+  glCompileShader(frag_id); eglGetShaderInfoLog(frag_id);
+
+  GLuint prog = glCreateProgram();
+  glAttachShader(prog, vert_id);
+  glAttachShader(prog, frag_id);
+
+  return prog;
 }
 
 void LightRays::setupBuffers() {
+  // SETUP FB
+  // -------------------------------------------
+  glGenFramebuffers(1, &fbo);
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+  
+  // Depth buffer
+  glGenRenderbuffers(1, &depth_rbo);
+  glBindRenderbuffer(GL_RENDERBUFFER, depth_rbo);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, fbo_w, fbo_h);
+  glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_rbo);
+
+  // Render occluded scene to texture
+  glGenTextures(1, &tex_occlusion);
+  glBindTexture(GL_TEXTURE_2D, tex_occlusion);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fbo_w, fbo_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+  glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex_occlusion, 0);
+
+  // Occluded scene is used to create rays which are rendered into tex_rays
+  glGenTextures(1, &tex_rays);
+  glBindTexture(GL_TEXTURE_2D, tex_rays);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fbo_w, fbo_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+  glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, tex_rays, 0);
+
+  // Shaded scene (not really necessary but handy to debug draw all stages)
+  glGenTextures(1, &tex_shaded);
+  glBindTexture(GL_TEXTURE_2D, tex_shaded);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fbo_w, fbo_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+  glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, tex_shaded, 0);
+
+  eglCheckFramebufferStatus();
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glDrawBuffer(GL_BACK_LEFT);
+
+
+  // SETUP VAO/VBO (fullscreen)
+  // -------------------------------------------
+  glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
+  glGenBuffers(1, &vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  GLfloat verts[] = {
+    -1.0f, -1.0f, 0.0f, 0.0f,
+    1.0f, -1.0f, 1.0f, 0.0f, 
+    1.0f, 1.0f, 1.0f, 1.0f,
+
+    -1.0f, -1.0f, 0.0f, 0.0f,
+    1.0f, 1.0f, 1.0f, 1.0f,
+    -1.0f, 1.0f, 0.0f, 1.0f
+  };
+  glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+  
+  glEnableVertexAttribArray(0); // pos
+  glEnableVertexAttribArray(1); // tex
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (GLvoid*)0);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (GLvoid*)8);
+  
+}
+
+
+// STEP 1: RENDER SCENE WITH LIGHT + OCCLUDED OBJECTS
+// --------------------------------------------------
+void LightRays::beginOcclusionAndLightPass() {
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+  glViewport(0,0,fbo_w, fbo_h);
+  glDrawBuffer(GL_COLOR_ATTACHMENT0); 
+  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glDepthMask(GL_FALSE);
+}
+
+void LightRays::endOcclusionAndLightPass() {
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glDrawBuffer(GL_BACK_LEFT);
+  glDepthMask(GL_TRUE);
+}
+
+// STEP 2: CREATE LIGHT RAYS USING OCCLUSION TEXTURE
+// --------------------------------------------------
+void LightRays::createRays() {
+  // setup fbo/shader/vao
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+  glViewport(0,0,fbo_w, fbo_h);
+  glDrawBuffer(GL_COLOR_ATTACHMENT1);
+  glBindVertexArray(vao);  
+  glUseProgram(rays_prog);
+  
+  // set texture
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, tex_occlusion);
+  glUniform1i(utex, 0);
+  
+  // uniforms + draw
+  glUniform1f(uexposure, exposure);
+  glUniform1f(udecay, decay);
+  glUniform1f(udensity, density);
+  glUniform1f(uweight, weight);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
+
+  // reset
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glDrawBuffer(GL_BACK_LEFT);
+}
+
+
+// STEP 3: CAPTURE SHADED SCENE TOO (not really needed, but handy to debug draw)
+// -----------------------------------------------------------------------------
+void LightRays::beginShadedPass() {
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+  glViewport(0,0,fbo_w, fbo_h);
+  glDrawBuffer(GL_COLOR_ATTACHMENT2); // tex_shaded
+  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void LightRays::endShadedPass() {
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glDrawBuffer(GL_BACK_LEFT);
 }
