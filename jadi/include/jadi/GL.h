@@ -6,8 +6,8 @@
 #include <opengl/glfw3.h>
 
 #if JADI_PLATFORM == JADI_OSX
-#include <openGL/GL.h> 
-#include <openGL/glext.h>
+//#include <openGL/GL.h> 
+//#include <openGL/glext.h>
 #undef glGenVertexArrays
 #undef glBindVertexArray
 #define glGenVertexArrays glGenVertexArraysAPPLE
