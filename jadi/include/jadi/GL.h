@@ -1,7 +1,8 @@
 #ifndef JADI_GL_H
+#define JADI_GL_H
 
 #define GLSL(version, shader)  "#version " #version "\n" #shader
-
+#include <assert.h>
 #include <opengl/glew.h>
 #include <opengl/glfw3.h>
 
@@ -72,6 +73,22 @@
           }                                                     \
       }                                                         \
   }
+
+
+// Creates a vertex + frag shader and a program. 
+// We do not yet link the program so you can set attribute locations
+inline GLuint create_shader(const char* vs, const char* fs) {
+  GLuint vert_id = glCreateShader(GL_VERTEX_SHADER);
+  GLuint frag_id = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(vert_id, 1, &vs, NULL);
+  glShaderSource(frag_id, 1, &fs, NULL);
+  glCompileShader(vert_id); eglGetShaderInfoLog(vert_id);
+  glCompileShader(frag_id); eglGetShaderInfoLog(frag_id);
+  GLuint prog = glCreateProgram();
+  glAttachShader(prog, vert_id);
+  glAttachShader(prog, frag_id);
+  return prog;
+}
 
 
 #endif

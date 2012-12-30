@@ -20,6 +20,7 @@ static const char* LR_IMAGE_FS = GLSL(120,
   uniform sampler2D u_tex;
   void main() {
     gl_FragColor = texture2D(u_tex, v_tex);
+    //gl_FragColor.rgb = vec3(gl_FragColor.r * 0.2126 + gl_FragColor.g * 0.7152 + gl_FragColor.b * 0.0722);
     gl_FragColor.a = 1.0;
   }
 );
